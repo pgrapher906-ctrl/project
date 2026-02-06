@@ -12,24 +12,28 @@ login_manager = LoginManager()
 migrate = Migrate()
 bcrypt = Bcrypt()
 
+login_manager.login_view = "main.login"   # redirect if not logged in
+
 def create_app():
     load_dotenv()
     app = Flask(__name__)
     app.config.from_object(Config)
 
     db.init_app(app)
-
     login_manager.init_app(app)
-    login_manager.login_view = "main.login"   # 🔥 Redirect unauthorized users
-    login_manager.login_message = "Please log in to access this page."
-    login_manager.login_message_category = "info"
-
     migrate.init_app(app, db)
     bcrypt.init_app(app)
 
-    # Import models here so Flask-Migrate can detect them
+    # Import models
+    from app.models import User
     from app import models
     from app.routes import main
+
+    # 👇 THIS IS THE IMPORTANT PART
+    @login_manager.user_loader
+    def load_user(user_id):
+        return User.query.get(int(user_id))
+
     app.register_blueprint(main)
 
     return app
