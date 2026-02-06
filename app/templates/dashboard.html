@@ -1,30 +1,42 @@
 {% extends 'base.html' %}
-
 {% block title %}Dashboard | Smart Water Monitoring System{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<style>
+#map {
+    height: 300px;
+    margin-top: 10px;
+    border-radius: 10px;
+}
+.readonly {
+    background: #f2f2f2;
+}
+.step-title {
+    margin-top: 20px;
+    font-weight: bold;
+}
+</style>
+{% endblock %}
 
 {% block content %}
 <div class="dashboard-container">
-
     <div class="card dashboard-card">
         <h2>Data Entry Dashboard</h2>
 
-        <p>
-            Welcome, {{ current_user.username }}! <br>
-            Begin your water quality data entry workflow below.
-        </p>
-
-        <hr>
+        <form method="POST" action="/save_data" enctype="multipart/form-data">
 
         <!-- STEP 1 -->
-        <h3>Step 1 – Location</h3>
-        <button onclick="getLocation()">Get Current Location</button>
-        <p id="location-output"></p>
-
-        <hr>
+        <div class="step-title">Step 1 – Location</div>
+        <button type="button" onclick="getLocation()">Detect Location</button>
+        <div id="map"></div>
+        <input type="hidden" name="latitude" id="latitude">
+        <input type="hidden" name="longitude" id="longitude">
 
         <!-- STEP 2 -->
-        <h3>Step 2 – Water Type</h3>
-        <select id="water-type">
+        <div class="step-title">Step 2 – Water Type</div>
+        <select name="water_type" required>
+            <option value="">Select Water Type</option>
             <option>Open Ocean Water</option>
             <option>Coastal Water</option>
             <option>Estuarine Water</option>
@@ -35,55 +47,94 @@
             <option>Ground Water</option>
         </select>
 
-        <hr>
-
         <!-- STEP 3 -->
-        <h3>Step 3 – Pin ID</h3>
-        <input type="text" placeholder="Enter Pin ID">
-
-        <hr>
+        <div class="step-title">Step 3 – Pin ID</div>
+        <input type="text" name="pin_id" placeholder="Enter Pin ID" required>
 
         <!-- STEP 4 -->
-        <h3>Step 4 – Bluetooth</h3>
-        <button>Scan BLE Devices</button>
-        <p>Status: Not Connected</p>
-
-        <hr>
+        <div class="step-title">Step 4 – Bluetooth</div>
+        <button type="button" onclick="scanBLE()">Scan Nearby BLE Devices</button>
+        <p>Status: <span id="bleStatus">Not Connected</span></p>
 
         <!-- STEP 5 -->
-        <h3>Step 5 – Sensor Data</h3>
-        <button>Read Sensor Data</button>
+        <div class="step-title">Step 5 – Read Sensor Data</div>
+        <button type="button" onclick="readSensor()">Read Sensor Data</button>
 
-        <div class="sensor-fields">
-            <input type="text" placeholder="Temperature" readonly>
-            <input type="text" placeholder="pH" readonly>
-            <input type="text" placeholder="TDS" readonly>
-            <input type="text" placeholder="Chlorophyll" readonly>
-        </div>
+        <br><br>
 
-        <hr>
+        <!-- Sensor Fields (Read-only) -->
+        <input class="readonly" name="temperature" placeholder="Temperature" readonly>
+        <input class="readonly" name="ph" placeholder="pH" readonly>
+        <input class="readonly" name="tds" placeholder="TDS" readonly>
+        <input class="readonly" name="chlorophyll" placeholder="Chlorophyll" readonly>
+        <input class="readonly" name="ta" placeholder="TA" readonly>
+        <input class="readonly" name="dic" placeholder="DIC" readonly>
+        <input class="readonly" name="do" placeholder="DO" readonly>
 
         <!-- STEP 6 -->
-        <h3>Step 6 – Upload Image</h3>
-        <input type="file">
+        <div class="step-title">Step 6 – Upload Image</div>
+        <input type="file" name="image">
 
+        <br><br>
+        <button type="submit">Save Data</button>
+
+        </form>
     </div>
-
 </div>
 {% endblock %}
 
 {% block scripts %}
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
 <script>
+let map;
+let marker;
+
+// ----------------- STEP 1 LOCATION -----------------
 function getLocation() {
     if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function(position) {
-            document.getElementById("location-output").innerText =
-                "Latitude: " + position.coords.latitude +
-                ", Longitude: " + position.coords.longitude;
-        });
+        navigator.geolocation.getCurrentPosition(showPosition);
     } else {
-        alert("Geolocation not supported");
+        alert("Geolocation not supported.");
     }
+}
+
+function showPosition(position) {
+    const lat = position.coords.latitude;
+    const lon = position.coords.longitude;
+
+    document.getElementById("latitude").value = lat;
+    document.getElementById("longitude").value = lon;
+
+    if (!map) {
+        map = L.map('map').setView([lat, lon], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+    }
+
+    if (marker) {
+        marker.setLatLng([lat, lon]);
+    } else {
+        marker = L.marker([lat, lon]).addTo(map);
+    }
+}
+
+// ----------------- STEP 4 BLUETOOTH -----------------
+async function scanBLE() {
+    try {
+        const device = await navigator.bluetooth.requestDevice({
+            acceptAllDevices: true
+        });
+        document.getElementById("bleStatus").innerText = "Connected";
+    } catch (error) {
+        document.getElementById("bleStatus").innerText = "Not Connected";
+    }
+}
+
+// ----------------- STEP 5 SENSOR -----------------
+function readSensor() {
+    alert("Sensor reading will be enabled after ESP32 integration.");
 }
 </script>
 {% endblock %}
