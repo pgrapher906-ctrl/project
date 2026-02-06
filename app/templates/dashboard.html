@@ -1,14 +1,36 @@
 {% extends 'base.html' %}
 {% block title %}Dashboard | Smart Water Monitoring System{% endblock %}
+
 {% block content %}
 <div class="dashboard-container">
+
     <div class="card dashboard-card">
         <h2>Data Entry Dashboard</h2>
+
         <div id="data-entry-steps">
-            <!-- Data entry workflow will be implemented here -->
-            <p>Welcome, {{ user.username }}!<br>
-            Begin your water quality data entry workflow below.</p>
+
+            <p>
+                Welcome, {{ current_user.username }}!<br>
+                Begin your water quality data entry workflow below.
+            </p>
+
+            <hr>
+
+            <!-- Placeholder for future workflow -->
+            <div class="workflow-placeholder">
+                <p>🚀 Data Entry Modules will appear here:</p>
+                <ul>
+                    <li>Project Selection</li>
+                    <li>Location Detection</li>
+                    <li>Water Type Selection</li>
+                    <li>Pin ID Entry</li>
+                    <li>Bluetooth Sensor Read</li>
+                    <li>Image Upload</li>
+                </ul>
+            </div>
+
         </div>
     </div>
+
 </div>
 {% endblock %}
