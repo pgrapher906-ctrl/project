@@ -1,85 +1,88 @@
 {% extends 'base.html' %}
-{% block title %}Dashboard | Smart Water Monitoring System{% endblock %}
+{% block title %}Dashboard{% endblock %}
 
 {% block head %}
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-<style>
-#map {
-    height: 300px;
-    margin-top: 10px;
-    border-radius: 10px;
-}
-.readonly {
-    background: #f2f2f2;
-}
-.step-title {
-    margin-top: 20px;
-    font-weight: bold;
-}
-</style>
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
 {% endblock %}
 
 {% block content %}
-<div class="dashboard-container">
-    <div class="card dashboard-card">
-        <h2>Data Entry Dashboard</h2>
+<div class="dashboard-card">
 
-        <form method="POST" action="/save_data" enctype="multipart/form-data">
+    <h3 class="mb-4">Data Entry Dashboard</h3>
+
+    <form method="POST" action="/save_data" enctype="multipart/form-data">
 
         <!-- STEP 1 -->
-        <div class="step-title">Step 1 – Location</div>
-        <button type="button" onclick="getLocation()">Detect Location</button>
+        <div class="section-title">Step 1 – Location</div>
+        <button type="button" class="btn btn-primary btn-sm mb-2" onclick="getLocation()">
+            Detect Location
+        </button>
         <div id="map"></div>
         <input type="hidden" name="latitude" id="latitude">
         <input type="hidden" name="longitude" id="longitude">
 
         <!-- STEP 2 -->
-        <div class="step-title">Step 2 – Water Type</div>
-        <select name="water_type" required>
+        <div class="section-title">Step 2 – Water Type</div>
+        <select class="form-select" name="water_type" required>
             <option value="">Select Water Type</option>
             <option>Open Ocean Water</option>
-            <option>Coastal Water</option>
-            <option>Estuarine Water</option>
-            <option>Deep Sea Water</option>
-            <option>Marine Surface Water</option>
             <option>Pond Water</option>
             <option>Drinking Water</option>
             <option>Ground Water</option>
         </select>
 
         <!-- STEP 3 -->
-        <div class="step-title">Step 3 – Pin ID</div>
-        <input type="text" name="pin_id" placeholder="Enter Pin ID" required>
+        <div class="section-title">Step 3 – Pin ID</div>
+        <input type="text" class="form-control" name="pin_id" required>
 
         <!-- STEP 4 -->
-        <div class="step-title">Step 4 – Bluetooth</div>
-        <button type="button" onclick="scanBLE()">Scan Nearby BLE Devices</button>
-        <p>Status: <span id="bleStatus">Not Connected</span></p>
+        <div class="section-title">Step 4 – Bluetooth</div>
+        <button type="button" class="btn btn-outline-primary btn-sm" onclick="scanBLE()">
+            Scan BLE Devices
+        </button>
+        <p class="mt-2">Status: <strong id="bleStatus">Not Connected</strong></p>
 
         <!-- STEP 5 -->
-        <div class="step-title">Step 5 – Read Sensor Data</div>
-        <button type="button" onclick="readSensor()">Read Sensor Data</button>
+        <div class="section-title">Step 5 – Sensor Data</div>
+        <button type="button" class="btn btn-primary btn-sm mb-3" onclick="readSensor()">
+            Read Sensor Data
+        </button>
 
-        <br><br>
-
-        <!-- Sensor Fields (Read-only, no auto fill) -->
-        <input class="readonly" name="temperature" placeholder="Temperature" readonly>
-        <input class="readonly" name="ph" placeholder="pH" readonly>
-        <input class="readonly" name="tds" placeholder="TDS" readonly>
-        <input class="readonly" name="chlorophyll" placeholder="Chlorophyll" readonly>
-        <input class="readonly" name="ta" placeholder="TA" readonly>
-        <input class="readonly" name="dic" placeholder="DIC" readonly>
-        <input class="readonly" name="do" placeholder="DO" readonly>
+        <div class="row g-3">
+            <div class="col-md-4">
+                <input class="form-control readonly" name="temperature" placeholder="Temperature" readonly>
+            </div>
+            <div class="col-md-4">
+                <input class="form-control readonly" name="ph" placeholder="pH" readonly>
+            </div>
+            <div class="col-md-4">
+                <input class="form-control readonly" name="tds" placeholder="TDS" readonly>
+            </div>
+            <div class="col-md-4">
+                <input class="form-control readonly" name="chlorophyll" placeholder="Chlorophyll" readonly>
+            </div>
+            <div class="col-md-4">
+                <input class="form-control readonly" name="ta" placeholder="TA" readonly>
+            </div>
+            <div class="col-md-4">
+                <input class="form-control readonly" name="dic" placeholder="DIC" readonly>
+            </div>
+            <div class="col-md-4">
+                <input class="form-control readonly" name="do" placeholder="DO" readonly>
+            </div>
+        </div>
 
         <!-- STEP 6 -->
-        <div class="step-title">Step 6 – Upload Image</div>
-        <input type="file" name="image">
+        <div class="section-title">Step 6 – Upload Image</div>
+        <input type="file" class="form-control">
 
-        <br><br>
-        <button type="submit">Save Data</button>
+        <div class="mt-4">
+            <button type="submit" class="btn btn-success">
+                Save Data
+            </button>
+        </div>
 
-        </form>
-    </div>
+    </form>
 </div>
 {% endblock %}
 
@@ -90,59 +93,36 @@
 let map;
 let marker;
 
-// Initialize map when page loads
-document.addEventListener("DOMContentLoaded", function () {
-    map = L.map('map').setView([20.5937, 78.9629], 5); // Default India view
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap'
-    }).addTo(map);
-});
-
-// STEP 1 – Location
 function getLocation() {
-    if (!navigator.geolocation) {
-        alert("Geolocation not supported.");
-        return;
-    }
-
-    navigator.geolocation.getCurrentPosition(
-        function(position) {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
             const lat = position.coords.latitude;
             const lon = position.coords.longitude;
 
             document.getElementById("latitude").value = lat;
             document.getElementById("longitude").value = lon;
 
-            map.setView([lat, lon], 15);
+            if (!map) {
+                map = L.map('map').setView([lat, lon], 13);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png')
+                    .addTo(map);
+            }
 
             if (marker) {
                 marker.setLatLng([lat, lon]);
             } else {
                 marker = L.marker([lat, lon]).addTo(map);
             }
-        },
-        function() {
-            alert("Please allow location access.");
-        }
-    );
-}
-
-// STEP 4 – Bluetooth (UI only)
-async function scanBLE() {
-    try {
-        const device = await navigator.bluetooth.requestDevice({
-            acceptAllDevices: true
         });
-        document.getElementById("bleStatus").innerText = "Connected";
-    } catch (error) {
-        document.getElementById("bleStatus").innerText = "Not Connected";
     }
 }
 
-// STEP 5 – Sensor (Disabled for now)
+function scanBLE() {
+    alert("Bluetooth will activate when ESP32 is integrated.");
+}
+
 function readSensor() {
-    alert("Sensor integration will be enabled after ESP32 backend connection.");
+    alert("Sensor integration pending.");
 }
 </script>
 {% endblock %}
