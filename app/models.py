@@ -2,7 +2,10 @@ from datetime import datetime
 from app import db
 from flask_login import UserMixin
 
+
 class User(db.Model, UserMixin):
+    __tablename__ = "users"   # ✅ MATCHES NEON TABLE
+
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
@@ -11,10 +14,18 @@ class User(db.Model, UserMixin):
     visit_count = db.Column(db.Integer, default=0)
     last_login = db.Column(db.DateTime)
 
+    # Relationship
+    water_records = db.relationship('WaterData', backref='user', lazy=True)
+
+
 class WaterData(db.Model):
+    __tablename__ = "water_data"   # ✅ MATCHES NEON TABLE
+
     id = db.Column(db.Integer, primary_key=True)
 
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    # 🔥 IMPORTANT FIX HERE
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))  # was 'user.id'
+
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
     latitude = db.Column(db.Float)
