@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}Select Water Type{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="card dashboard-card" style="text-align:center">
+
+        <h2>Select Water Type</h2>
+        <p>Please choose the monitoring category</p>
+
+        <form method="POST">
+
+            <button type="submit" name="water_type" value="ocean" class="btn btn-primary" style="width:200px;margin:10px;">
+                🌊 Ocean Water
+            </button>
+
+            <button type="submit" name="water_type" value="pond" class="btn btn-success" style="width:200px;margin:10px;">
+                🏞 Pond Water
+            </button>
+
+        </form>
+
+    </div>
+</div>
+{% endblock %}
