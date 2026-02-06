@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+
 {% block title %}Dashboard | Smart Water Monitoring System{% endblock %}
 
 {% block content %}
@@ -7,30 +8,82 @@
     <div class="card dashboard-card">
         <h2>Data Entry Dashboard</h2>
 
-        <div id="data-entry-steps">
+        <p>
+            Welcome, {{ current_user.username }}! <br>
+            Begin your water quality data entry workflow below.
+        </p>
 
-            <p>
-                Welcome, {{ current_user.username }}!<br>
-                Begin your water quality data entry workflow below.
-            </p>
+        <hr>
 
-            <hr>
+        <!-- STEP 1 -->
+        <h3>Step 1 – Location</h3>
+        <button onclick="getLocation()">Get Current Location</button>
+        <p id="location-output"></p>
 
-            <!-- Placeholder for future workflow -->
-            <div class="workflow-placeholder">
-                <p>🚀 Data Entry Modules will appear here:</p>
-                <ul>
-                    <li>Project Selection</li>
-                    <li>Location Detection</li>
-                    <li>Water Type Selection</li>
-                    <li>Pin ID Entry</li>
-                    <li>Bluetooth Sensor Read</li>
-                    <li>Image Upload</li>
-                </ul>
-            </div>
+        <hr>
 
+        <!-- STEP 2 -->
+        <h3>Step 2 – Water Type</h3>
+        <select id="water-type">
+            <option>Open Ocean Water</option>
+            <option>Coastal Water</option>
+            <option>Estuarine Water</option>
+            <option>Deep Sea Water</option>
+            <option>Marine Surface Water</option>
+            <option>Pond Water</option>
+            <option>Drinking Water</option>
+            <option>Ground Water</option>
+        </select>
+
+        <hr>
+
+        <!-- STEP 3 -->
+        <h3>Step 3 – Pin ID</h3>
+        <input type="text" placeholder="Enter Pin ID">
+
+        <hr>
+
+        <!-- STEP 4 -->
+        <h3>Step 4 – Bluetooth</h3>
+        <button>Scan BLE Devices</button>
+        <p>Status: Not Connected</p>
+
+        <hr>
+
+        <!-- STEP 5 -->
+        <h3>Step 5 – Sensor Data</h3>
+        <button>Read Sensor Data</button>
+
+        <div class="sensor-fields">
+            <input type="text" placeholder="Temperature" readonly>
+            <input type="text" placeholder="pH" readonly>
+            <input type="text" placeholder="TDS" readonly>
+            <input type="text" placeholder="Chlorophyll" readonly>
         </div>
+
+        <hr>
+
+        <!-- STEP 6 -->
+        <h3>Step 6 – Upload Image</h3>
+        <input type="file">
+
     </div>
 
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function getLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+            document.getElementById("location-output").innerText =
+                "Latitude: " + position.coords.latitude +
+                ", Longitude: " + position.coords.longitude;
+        });
+    } else {
+        alert("Geolocation not supported");
+    }
+}
+</script>
 {% endblock %}
