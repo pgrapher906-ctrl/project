@@ -12,10 +12,11 @@ login_manager = LoginManager()
 migrate = Migrate()
 bcrypt = Bcrypt()
 
-login_manager.login_view = "main.login"   # redirect if not logged in
+login_manager.login_view = "main.login"  # redirect if not logged in
 
 def create_app():
     load_dotenv()
+
     app = Flask(__name__)
     app.config.from_object(Config)
 
@@ -26,14 +27,17 @@ def create_app():
 
     # Import models
     from app.models import User
-    from app import models
     from app.routes import main
 
-    # 👇 THIS IS THE IMPORTANT PART
+    # ✅ USER LOADER (REQUIRED)
     @login_manager.user_loader
     def load_user(user_id):
         return User.query.get(int(user_id))
 
     app.register_blueprint(main)
+
+    # ✅ CREATE TABLES AUTOMATICALLY (VERY IMPORTANT FOR YOUR CLEAN NEON DB)
+    with app.app_context():
+        db.create_all()
 
     return app
