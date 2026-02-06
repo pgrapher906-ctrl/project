@@ -1,27 +1,30 @@
-from datetime import datetime
+from datetime import datetime, date
 from app import db
 from flask_login import UserMixin
 
+
 class User(db.Model, UserMixin):
-    __tablename__ = "users"   # IMPORTANT: match Neon table name
+    __tablename__ = "users"
 
     id = db.Column(db.Integer, primary_key=True)
-
     username = db.Column(db.String(100), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
-
-    # Must match Neon column name
     password_hash = db.Column(db.String(200), nullable=False)
 
     visit_count = db.Column(db.Integer, default=0)
-    last_login = db.Column(db.DateTime)
+    last_login_date = db.Column(db.Date)
+    last_login_time = db.Column(db.Time)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    water_data = db.relationship("WaterData", backref="user", lazy=True)
+
 
 class WaterData(db.Model):
     __tablename__ = "water_data"
 
     id = db.Column(db.Integer, primary_key=True)
-
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
+
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
     latitude = db.Column(db.Float)
