@@ -18,7 +18,12 @@ def create_app():
     app.config.from_object(Config)
 
     db.init_app(app)
+
     login_manager.init_app(app)
+    login_manager.login_view = "main.login"   # 🔥 Redirect unauthorized users
+    login_manager.login_message = "Please log in to access this page."
+    login_manager.login_message_category = "info"
+
     migrate.init_app(app, db)
     bcrypt.init_app(app)
 
