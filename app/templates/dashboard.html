@@ -8,6 +8,7 @@
     height: 300px;
     border-radius: 12px;
     margin-top: 15px;
+    display: none;
 }
 .section-title {
     font-weight: 600;
@@ -38,19 +39,31 @@
 
 <!-- STEP 1 -->
 <div class="section-title">Step 1 – Detect Location</div>
-<button type="button" class="btn btn-primary btn-sm" onclick="getLocation()">
+
+<button type="button" class="btn btn-primary btn-sm mb-3" onclick="getLocation()">
     Detect Location
 </button>
 
-<div id="map"></div>
+<div class="row g-3">
+    <div class="col-md-6">
+        <input type="text" id="latitude" name="latitude"
+               class="form-control"
+               placeholder="Latitude"
+               onchange="updateMapFromInput()">
+    </div>
+    <div class="col-md-6">
+        <input type="text" id="longitude" name="longitude"
+               class="form-control"
+               placeholder="Longitude"
+               onchange="updateMapFromInput()">
+    </div>
+</div>
 
-<input type="hidden" name="latitude" id="latitude">
-<input type="hidden" name="longitude" id="longitude">
+<div id="map"></div>
 
 <!-- STEP 2 -->
 <div class="section-title">Step 2 – Water Type</div>
 <select class="form-select mb-3" name="water_type" required>
-
 {% if water_type == "ocean" %}
     <option value="">Select Water Type</option>
     <option>Open Ocean Water</option>
@@ -64,7 +77,6 @@
     <option>Drinking Water</option>
     <option>Ground Water</option>
 {% endif %}
-
 </select>
 
 <!-- STEP 3 -->
@@ -77,8 +89,8 @@
     Scan BLE Devices
 </button>
 <p class="mt-2">
-Status:
-<span id="bleStatus" class="status-disconnected">Not Connected</span>
+    Status:
+    <span id="bleStatus" class="status-disconnected">Not Connected</span>
 </p>
 
 <!-- STEP 5 -->
@@ -89,36 +101,34 @@ Status:
 
 <div class="row g-3">
 
-<div class="col-md-4">
-<input class="form-control readonly" name="temperature" placeholder="Temperature" readonly>
-</div>
+    <div class="col-md-4">
+        <input class="form-control readonly" name="temperature" placeholder="Temperature" readonly>
+    </div>
 
-<div class="col-md-4">
-<input class="form-control readonly" name="ph" placeholder="pH" readonly>
-</div>
+    <div class="col-md-4">
+        <input class="form-control readonly" name="ph" placeholder="pH" readonly>
+    </div>
 
-<div class="col-md-4">
-<input class="form-control readonly" name="tds" placeholder="TDS" readonly>
-</div>
+    <div class="col-md-4">
+        <input class="form-control readonly" name="tds" placeholder="TDS" readonly>
+    </div>
 
 {% if water_type == "ocean" %}
-<div class="col-md-4">
-<input class="form-control readonly" name="chlorophyll" placeholder="Chlorophyll" readonly>
-</div>
-
-<div class="col-md-4">
-<input class="form-control readonly" name="ta" placeholder="Total Alkalinity (TA)" readonly>
-</div>
-
-<div class="col-md-4">
-<input class="form-control readonly" name="dic" placeholder="Dissolved Inorganic Carbon (DIC)" readonly>
-</div>
+    <div class="col-md-4">
+        <input class="form-control readonly" name="chlorophyll" placeholder="Chlorophyll" readonly>
+    </div>
+    <div class="col-md-4">
+        <input class="form-control readonly" name="ta" placeholder="Total Alkalinity (TA)" readonly>
+    </div>
+    <div class="col-md-4">
+        <input class="form-control readonly" name="dic" placeholder="DIC" readonly>
+    </div>
 {% endif %}
 
 {% if water_type == "pond" %}
-<div class="col-md-4">
-<input class="form-control readonly" name="do" placeholder="Dissolved Oxygen (DO)" readonly>
-</div>
+    <div class="col-md-4">
+        <input class="form-control readonly" name="do" placeholder="Dissolved Oxygen (DO)" readonly>
+    </div>
 {% endif %}
 
 </div>
@@ -127,13 +137,14 @@ Status:
 <div class="section-title">Step 6 – Upload Image</div>
 <input type="file" class="form-control mb-3" name="image">
 
-<button type="submit" class="btn btn-success mt-3">
-Save Data
+<button type="submit" class="btn btn-success">
+    Save Data
 </button>
 
 </form>
 </div>
 {% endblock %}
+
 
 {% block scripts %}
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
@@ -142,7 +153,7 @@ Save Data
 let map = null;
 let marker = null;
 
-// ================= LOCATION =================
+// ===== Detect Location =====
 function getLocation() {
 
     if (!navigator.geolocation) {
@@ -159,31 +170,7 @@ function getLocation() {
             document.getElementById("latitude").value = lat;
             document.getElementById("longitude").value = lon;
 
-            setTimeout(() => {
-
-                if (!map) {
-
-                    map = L.map('map').setView([lat, lon], 13);
-
-                    L.tileLayer(
-                        'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                        { attribution: '&copy; OpenStreetMap contributors' }
-                    ).addTo(map);
-
-                } else {
-                    map.setView([lat, lon], 13);
-                }
-
-                if (marker) {
-                    marker.setLatLng([lat, lon]);
-                } else {
-                    marker = L.marker([lat, lon]).addTo(map);
-                }
-
-                map.invalidateSize();
-
-            }, 300);
-
+            showMap(lat, lon);
         },
         function(error) {
             alert("Location permission denied.");
@@ -191,14 +178,46 @@ function getLocation() {
     );
 }
 
+// ===== Show Map =====
+function showMap(lat, lon) {
 
-// ================= BLUETOOTH =================
+    document.getElementById("map").style.display = "block";
+
+    if (!map) {
+        map = L.map('map').setView([lat, lon], 13);
+
+        L.tileLayer(
+            'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+            { attribution: '&copy; OpenStreetMap contributors' }
+        ).addTo(map);
+    } else {
+        map.setView([lat, lon], 13);
+    }
+
+    if (marker) {
+        marker.setLatLng([lat, lon]);
+    } else {
+        marker = L.marker([lat, lon]).addTo(map);
+    }
+
+    map.invalidateSize();
+}
+
+// ===== Manual Lat/Lon Change =====
+function updateMapFromInput() {
+    const lat = parseFloat(document.getElementById("latitude").value);
+    const lon = parseFloat(document.getElementById("longitude").value);
+
+    if (!isNaN(lat) && !isNaN(lon)) {
+        showMap(lat, lon);
+    }
+}
+
+// ===== Bluetooth =====
 async function scanBLE() {
-
     const status = document.getElementById("bleStatus");
 
     try {
-
         const device = await navigator.bluetooth.requestDevice({
             acceptAllDevices: true
         });
@@ -208,17 +227,15 @@ async function scanBLE() {
         status.classList.add("status-connected");
 
     } catch (error) {
-
         status.innerText = "Not Connected";
         status.classList.remove("status-connected");
         status.classList.add("status-disconnected");
     }
 }
 
-
-// ================= SENSOR =================
+// ===== Sensor Placeholder =====
 function readSensor() {
-    alert("ESP32 backend integration required for live sensor data.");
+    alert("ESP32 backend integration required.");
 }
 </script>
 {% endblock %}
