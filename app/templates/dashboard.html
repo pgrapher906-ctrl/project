@@ -1,4 +1,4 @@
-                {% extends 'base.html' %}
+{% extends 'base.html' %}
 {% block title %}Dashboard{% endblock %}
 
 {% block head %}
@@ -16,7 +16,12 @@
     color: #0A3D62;
 }
 .readonly {
-    background-color: #f4f6f9;
+    background-color: #F4F6F9;
+}
+.mode-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 14px;
 }
 </style>
 {% endblock %}
@@ -24,7 +29,13 @@
 {% block content %}
 <div class="container mt-4">
 
-<h3 class="mb-4 text-primary">Water Quality Data Entry</h3>
+<h3 class="mb-3 text-primary">Water Quality Data Entry</h3>
+
+{% if water_type == "ocean" %}
+    <span class="mode-badge bg-primary text-white">Ocean Monitoring Mode</span>
+{% elif water_type == "pond" %}
+    <span class="mode-badge bg-success text-white">Pond / Inland Monitoring Mode</span>
+{% endif %}
 
 <form method="POST" action="/save_data" enctype="multipart/form-data">
 
@@ -39,37 +50,39 @@
 <input type="hidden" name="latitude" id="latitude">
 <input type="hidden" name="longitude" id="longitude">
 
+<!-- STEP 2 WATER TYPE -->
+<div class="section-title">Step 2 – Water Type</div>
+<select class="form-select mb-3" name="water_type" required>
 
-<!-- STEP 2 CATEGORY -->
-<div class="section-title">Step 2 – Water Category</div>
-<select class="form-select mb-3" id="category" onchange="updateWaterTypes()" required>
-    <option value="">Select Category</option>
-    <option value="ocean">Ocean Water</option>
-    <option value="pond">Pond / Drinking / Ground Water</option>
+    {% if water_type == "ocean" %}
+        <option value="">Select Water Type</option>
+        <option>Open Ocean Water</option>
+        <option>Coastal Water</option>
+        <option>Estuarine Water</option>
+        <option>Deep Sea Water</option>
+        <option>Marine Surface Water</option>
+    {% elif water_type == "pond" %}
+        <option value="">Select Water Type</option>
+        <option>Pond Water</option>
+        <option>Drinking Water</option>
+        <option>Ground Water</option>
+    {% endif %}
+
 </select>
 
-
-<!-- STEP 3 WATER TYPE -->
-<div class="section-title">Step 3 – Water Type</div>
-<select class="form-select mb-3" name="water_type" id="water_type" onchange="toggleParameters()" required>
-</select>
-
-
-<!-- STEP 4 PIN -->
-<div class="section-title">Step 4 – Pin ID</div>
+<!-- STEP 3 PIN -->
+<div class="section-title">Step 3 – Pin ID</div>
 <input type="text" class="form-control mb-3" name="pin_id" required>
 
-
-<!-- STEP 5 BLUETOOTH -->
-<div class="section-title">Step 5 – Bluetooth</div>
+<!-- STEP 4 BLUETOOTH -->
+<div class="section-title">Step 4 – Bluetooth</div>
 <button type="button" class="btn btn-outline-primary btn-sm" onclick="scanBLE()">
     Scan BLE Devices
 </button>
 <p class="mt-2">Status: <strong id="bleStatus">Not Connected</strong></p>
 
-
-<!-- STEP 6 SENSOR DATA -->
-<div class="section-title">Step 6 – Sensor Data</div>
+<!-- STEP 5 SENSOR DATA -->
+<div class="section-title">Step 5 – Sensor Data</div>
 <button type="button" class="btn btn-primary btn-sm mb-3" onclick="readSensor()">
     Read Sensor Data
 </button>
@@ -89,31 +102,31 @@
         <input class="form-control readonly" name="tds" placeholder="TDS" readonly>
     </div>
 
-    <!-- OCEAN -->
-    <div class="col-md-4 ocean-field d-none">
-        <input class="form-control readonly" name="chlorophyll" placeholder="Chlorophyll" readonly>
-    </div>
+    {% if water_type == "ocean" %}
+        <div class="col-md-4">
+            <input class="form-control readonly" name="chlorophyll" placeholder="Chlorophyll" readonly>
+        </div>
 
-    <div class="col-md-4 ocean-field d-none">
-        <input class="form-control readonly" name="ta" placeholder="TA" readonly>
-    </div>
+        <div class="col-md-4">
+            <input class="form-control readonly" name="ta" placeholder="Total Alkalinity (TA)" readonly>
+        </div>
 
-    <div class="col-md-4 ocean-field d-none">
-        <input class="form-control readonly" name="dic" placeholder="DIC" readonly>
-    </div>
+        <div class="col-md-4">
+            <input class="form-control readonly" name="dic" placeholder="Dissolved Inorganic Carbon (DIC)" readonly>
+        </div>
+    {% endif %}
 
-    <!-- POND -->
-    <div class="col-md-4 pond-field d-none">
-        <input class="form-control readonly" name="do" placeholder="Dissolved Oxygen (DO)" readonly>
-    </div>
+    {% if water_type == "pond" %}
+        <div class="col-md-4">
+            <input class="form-control readonly" name="do" placeholder="Dissolved Oxygen (DO)" readonly>
+        </div>
+    {% endif %}
 
 </div>
 
-
-<!-- STEP 7 IMAGE -->
-<div class="section-title">Step 7 – Upload Image</div>
+<!-- STEP 6 IMAGE -->
+<div class="section-title">Step 6 – Upload Image</div>
 <input type="file" class="form-control mb-3" name="image">
-
 
 <button type="submit" class="btn btn-success mt-3">
     Save Data
@@ -132,7 +145,6 @@
 let map;
 let marker;
 
-// LOCATION
 function getLocation() {
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function(position) {
@@ -161,55 +173,6 @@ function getLocation() {
     }
 }
 
-
-// WATER TYPE CONTROL
-function updateWaterTypes() {
-    const category = document.getElementById("category").value;
-    const waterTypeSelect = document.getElementById("water_type");
-
-    waterTypeSelect.innerHTML = "";
-
-    if (category === "ocean") {
-        waterTypeSelect.innerHTML = `
-            <option value="">Select Water Type</option>
-            <option>Open Ocean Water</option>
-            <option>Coastal Water</option>
-            <option>Estuarine Water</option>
-            <option>Deep Sea Water</option>
-            <option>Marine Surface Water</option>
-        `;
-    }
-
-    if (category === "pond") {
-        waterTypeSelect.innerHTML = `
-            <option value="">Select Water Type</option>
-            <option>Pond Water</option>
-            <option>Drinking Water</option>
-            <option>Ground Water</option>
-        `;
-    }
-}
-
-
-// PARAMETER SWITCH
-function toggleParameters() {
-
-    const selectedType = document.getElementById("category").value;
-
-    document.querySelectorAll(".ocean-field").forEach(el => el.classList.add("d-none"));
-    document.querySelectorAll(".pond-field").forEach(el => el.classList.add("d-none"));
-
-    if (selectedType === "ocean") {
-        document.querySelectorAll(".ocean-field").forEach(el => el.classList.remove("d-none"));
-    }
-
-    if (selectedType === "pond") {
-        document.querySelectorAll(".pond-field").forEach(el => el.classList.remove("d-none"));
-    }
-}
-
-
-// BLUETOOTH
 async function scanBLE() {
     try {
         const device = await navigator.bluetooth.requestDevice({
@@ -224,8 +187,6 @@ async function scanBLE() {
     }
 }
 
-
-// SENSOR
 function readSensor() {
     alert("Sensor integration will activate after ESP32 backend integration.");
 }
