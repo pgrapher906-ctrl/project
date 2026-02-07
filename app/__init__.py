@@ -12,7 +12,6 @@ login_manager = LoginManager()
 migrate = Migrate()
 bcrypt = Bcrypt()
 
-login_manager.login_view = "main.login"  # redirect if not logged in
 
 def create_app():
     load_dotenv()
@@ -20,23 +19,31 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
 
+    # Safety fallback (in case ENV not loaded on Render)
+    app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "super-secret-key")
+
+    # Initialize extensions
     db.init_app(app)
     login_manager.init_app(app)
     migrate.init_app(app, db)
     bcrypt.init_app(app)
 
-    # Import models
+    # Login settings
+    login_manager.login_view = "main.login"
+    login_manager.login_message_category = "warning"
+
+    # Import models & routes AFTER init
     from app.models import User
     from app.routes import main
 
-    # ✅ USER LOADER (REQUIRED)
+    # User loader (SQLAlchemy 2.0 safe)
     @login_manager.user_loader
     def load_user(user_id):
-        return User.query.get(int(user_id))
+        return db.session.get(User, int(user_id))
 
     app.register_blueprint(main)
 
-    # ✅ CREATE TABLES AUTOMATICALLY (VERY IMPORTANT FOR YOUR CLEAN NEON DB)
+    # Auto create tables (only if not exists)
     with app.app_context():
         db.create_all()
 
