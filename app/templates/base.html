@@ -11,7 +11,7 @@
     <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- ✅ LOAD YOUR CSS FILE -->
+    <!-- External CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 
     <style>
@@ -19,8 +19,6 @@
             margin: 0;
             font-family: 'Poppins', sans-serif;
             min-height: 100vh;
-
-            /* WATER BACKGROUND */
             background: linear-gradient(rgba(10,61,98,0.75), rgba(10,61,98,0.75)),
                         url("{{ url_for('static', filename='images/water-bg.jpg') }}");
             background-size: cover;
@@ -28,11 +26,11 @@
             background-attachment: fixed;
         }
 
-        /* NAVBAR */
         .navbar {
             background: linear-gradient(90deg, #0A3D62, #145374);
             padding: 14px 28px;
             box-shadow: 0 4px 25px rgba(0,0,0,0.2);
+            position: relative;
         }
 
         .navbar-brand {
@@ -41,6 +39,7 @@
             color: white !important;
             display: flex;
             align-items: center;
+            cursor: pointer;
         }
 
         .navbar-brand img {
@@ -72,27 +71,11 @@
             transform: translateY(-2px);
         }
 
-        /* GLASS CARD */
-        .glass-card {
-            background: rgba(255, 255, 255, 0.92);
-            backdrop-filter: blur(12px);
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-            padding: 35px;
-        }
-
-        .dashboard-card {
-            background: rgba(255,255,255,0.95);
-            border-radius: 20px;
-            box-shadow: 0 20px 45px rgba(0,0,0,0.15);
-            padding: 35px;
-        }
-
         /* USER POPUP */
         .info-popup {
             position: absolute;
-            top: 70px;
-            right: 25px;
+            top: 75px;
+            right: 30px;
             background: white;
             color: #0A3D62;
             padding: 18px 22px;
@@ -115,11 +98,6 @@
             .navbar {
                 padding: 10px 18px;
             }
-
-            .glass-card,
-            .dashboard-card {
-                padding: 25px;
-            }
         }
     </style>
 
@@ -131,7 +109,8 @@
 <nav class="navbar navbar-dark">
     <div class="container-fluid d-flex justify-content-between align-items-center">
 
-        <div class="navbar-brand">
+        <!-- CLICKABLE LOGO -->
+        <div class="navbar-brand" onclick="toggleUserInfo(event)">
             <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo">
             Smart Water Monitoring
         </div>
@@ -144,6 +123,20 @@
         {% endif %}
     </div>
 </nav>
+
+<!-- USER INFO POPUP -->
+{% if current_user.is_authenticated %}
+<div id="userInfoPopup" class="info-popup">
+    <div><strong>User:</strong> {{ current_user.username }}</div>
+    <div><strong>Visits:</strong> {{ current_user.visit_count }}</div>
+    {% if current_user.last_login %}
+    <div>
+        <strong>Last Login:</strong><br>
+        {{ current_user.last_login.strftime("%d-%m-%Y %H:%M") }}
+    </div>
+    {% endif %}
+</div>
+{% endif %}
 
 <div class="container mt-5">
 
@@ -162,6 +155,24 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+function toggleUserInfo(event) {
+    event.stopPropagation();
+    const popup = document.getElementById("userInfoPopup");
+    if (popup) {
+        popup.classList.toggle("show");
+    }
+}
+
+// Close when clicking outside
+document.addEventListener("click", function() {
+    const popup = document.getElementById("userInfoPopup");
+    if (popup) {
+        popup.classList.remove("show");
+    }
+});
+</script>
 
 {% block scripts %}{% endblock %}
 
