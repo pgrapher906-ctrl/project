@@ -5,9 +5,8 @@ from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.utils import secure_filename
 from app import db, bcrypt
 from app.models import User, WaterData
-from app.forms import LoginForm
+from app.forms import LoginForm, RegistrationForm
 
-# For Indian time (IST)
 import pytz
 
 main = Blueprint("main", __name__)
@@ -21,6 +20,37 @@ UPLOAD_FOLDER = "app/static/uploads"
 @main.route("/")
 def home():
     return redirect(url_for("main.login"))
+
+
+# =========================
+# REGISTER  ✅ ADDED
+# =========================
+@main.route("/register", methods=["GET", "POST"])
+def register():
+    form = RegistrationForm()
+
+    if form.validate_on_submit():
+        existing_user = User.query.filter_by(email=form.email.data).first()
+        if existing_user:
+            flash("Email already registered.", "danger")
+            return redirect(url_for("main.register"))
+
+        hashed_pw = bcrypt.generate_password_hash(form.password.data).decode("utf-8")
+
+        new_user = User(
+            username=form.username.data,
+            email=form.email.data,
+            password_hash=hashed_pw,
+            visit_count=0
+        )
+
+        db.session.add(new_user)
+        db.session.commit()
+
+        flash("Account created successfully! Please login.", "success")
+        return redirect(url_for("main.login"))
+
+    return render_template("register.html", form=form)
 
 
 # =========================
@@ -94,7 +124,7 @@ def logout():
 
 
 # =========================
-# SAVE DATA (FIXED)
+# SAVE DATA
 # =========================
 @main.route("/save_data", methods=["POST"])
 @login_required
@@ -133,7 +163,6 @@ def save_data():
         except:
             return None
 
-    # IST TIME FIX
     ist = pytz.timezone("Asia/Kolkata")
     current_time = datetime.now(ist)
 
