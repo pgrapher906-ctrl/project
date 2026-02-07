@@ -5,7 +5,6 @@
 {% block head %}
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
 <style>
-
 .glass-card {
     max-width: 1000px;
     margin: 40px auto;
@@ -23,13 +22,6 @@
     color: #0A3D62;
 }
 
-#map {
-    height: 300px;
-    border-radius: 15px;
-    margin-top: 15px;
-    display: none;
-}
-
 .sensor-box {
     background: #f4f9fc;
     border-radius: 12px;
@@ -38,18 +30,15 @@
     font-weight: 500;
 }
 
-.status-connected {
-    color: green;
-    font-weight: 600;
-}
-
-.status-disconnected {
-    color: red;
-    font-weight: 600;
+#map {
+    height: 300px;
+    border-radius: 15px;
+    margin-top: 15px;
+    display: none;
 }
 
 .custom-btn {
-    background: linear-gradient(90deg, #0A3D62, #1ABC9C);
+    background: linear-gradient(90deg,#0A3D62,#1ABC9C);
     color: white;
     border: none;
     padding: 10px 22px;
@@ -61,6 +50,15 @@
     opacity: 0.9;
 }
 
+.status-connected {
+    color: green;
+    font-weight: 600;
+}
+
+.status-disconnected {
+    color: red;
+    font-weight: 600;
+}
 </style>
 {% endblock %}
 
@@ -88,10 +86,16 @@
 <div id="map"></div>
 
 <!-- STEP 2 -->
-<div class="section-title">Step 2 - Water Type</div>
-<select class="form-select mb-3" name="water_type" id="waterType" onchange="toggleSensors()" required>
-    <option value="ocean">Open Ocean Water</option>
-    <option value="pond">Pond Water</option>
+<div class="section-title">Step 2 - Water Category</div>
+
+<select class="form-select mb-3" id="mainWaterType" onchange="updateWaterTypes()" required>
+    <option value="">Select Category</option>
+    <option value="ocean">Ocean / Marine</option>
+    <option value="pond">Pond / Freshwater</option>
+</select>
+
+<select class="form-select mb-3" id="waterType" name="water_type" onchange="toggleSensors()" required>
+    <option value="">Select Water Type</option>
 </select>
 
 <!-- STEP 3 -->
@@ -105,48 +109,37 @@
 
 <!-- STEP 5 -->
 <div class="section-title">Step 5 - Sensor Data</div>
-<button type="button" class="custom-btn mb-3" onclick="readSensor()">Read Sensor Data</button>
 
 <div class="row g-3">
-
     <div class="col-md-4">
         <input class="form-control sensor-box" name="temperature" placeholder="Temperature">
     </div>
-
     <div class="col-md-4">
         <input class="form-control sensor-box" name="ph" placeholder="pH">
     </div>
-
     <div class="col-md-4">
         <input class="form-control sensor-box" name="tds" placeholder="TDS">
     </div>
-
 </div>
 
-<!-- OCEAN ONLY -->
-<div id="oceanSensors" class="row g-3 mt-1">
-
+<!-- OCEAN SENSORS -->
+<div id="oceanSensors" class="row g-3 mt-2" style="display:none;">
     <div class="col-md-4">
         <input class="form-control sensor-box" name="chlorophyll" placeholder="Chlorophyll">
     </div>
-
     <div class="col-md-4">
         <input class="form-control sensor-box" name="ta" placeholder="Total Alkalinity">
     </div>
-
     <div class="col-md-4">
         <input class="form-control sensor-box" name="dic" placeholder="DIC">
     </div>
-
 </div>
 
-<!-- POND ONLY -->
-<div id="pondSensors" class="row g-3 mt-1" style="display:none;">
-
+<!-- POND SENSORS -->
+<div id="pondSensors" class="row g-3 mt-2" style="display:none;">
     <div class="col-md-4">
         <input class="form-control sensor-box" name="do" placeholder="Dissolved Oxygen">
     </div>
-
 </div>
 
 <!-- STEP 6 -->
@@ -162,25 +155,61 @@
 
 {% block scripts %}
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-
 <script>
 
 let map = null;
 let marker = null;
 
-function toggleSensors() {
-    const type = document.getElementById("waterType").value;
+function updateWaterTypes() {
+    const mainType = document.getElementById("mainWaterType").value;
+    const waterTypeDropdown = document.getElementById("waterType");
 
-    if (type === "ocean") {
-        document.getElementById("oceanSensors").style.display = "flex";
-        document.getElementById("pondSensors").style.display = "none";
-    } else {
-        document.getElementById("oceanSensors").style.display = "none";
-        document.getElementById("pondSensors").style.display = "flex";
+    waterTypeDropdown.innerHTML = "<option value=''>Select Water Type</option>";
+
+    let options = [];
+
+    if (mainType === "ocean") {
+        options = [
+            "Open Ocean Water",
+            "Coastal Water",
+            "Estuarine Water",
+            "Deep Sea Water",
+            "Marine Surface Water"
+        ];
+    } else if (mainType === "pond") {
+        options = [
+            "Pond Water",
+            "Lake Water",
+            "Drinking Water",
+            "Ground Water",
+            "River Water"
+        ];
     }
+
+    options.forEach(type => {
+        let option = document.createElement("option");
+        option.value = type;
+        option.textContent = type;
+        waterTypeDropdown.appendChild(option);
+    });
+
+    toggleSensors();
 }
 
-window.onload = toggleSensors;
+function toggleSensors() {
+    const mainType = document.getElementById("mainWaterType").value;
+
+    if (mainType === "ocean") {
+        document.getElementById("oceanSensors").style.display = "flex";
+        document.getElementById("pondSensors").style.display = "none";
+    } else if (mainType === "pond") {
+        document.getElementById("oceanSensors").style.display = "none";
+        document.getElementById("pondSensors").style.display = "flex";
+    } else {
+        document.getElementById("oceanSensors").style.display = "none";
+        document.getElementById("pondSensors").style.display = "none";
+    }
+}
 
 function getLocation() {
     if (!navigator.geolocation) return;
@@ -225,10 +254,6 @@ async function scanBLE() {
         status.innerText = "Not Connected";
         status.className = "status-disconnected";
     }
-}
-
-function readSensor() {
-    alert("ESP32 backend integration required.");
 }
 
 </script>
