@@ -5,6 +5,7 @@
 {% block head %}
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
 <style>
+
 .glass-card {
     max-width: 1000px;
     margin: 40px auto;
@@ -59,6 +60,7 @@
 .custom-btn:hover {
     opacity: 0.9;
 }
+
 </style>
 {% endblock %}
 
@@ -87,17 +89,9 @@
 
 <!-- STEP 2 -->
 <div class="section-title">Step 2 - Water Type</div>
-
 <select class="form-select mb-3" name="water_type" id="waterType" onchange="toggleSensors()" required>
-    <option value="ocean"
-        {% if request.form.get('water_type') == 'ocean' %}selected{% endif %}>
-        Open Ocean Water
-    </option>
-
-    <option value="pond"
-        {% if request.form.get('water_type') == 'pond' %}selected{% endif %}>
-        Pond Water
-    </option>
+    <option value="ocean">Open Ocean Water</option>
+    <option value="pond">Pond Water</option>
 </select>
 
 <!-- STEP 3 -->
@@ -115,43 +109,43 @@
 
 <div class="row g-3">
 
-<div class="col-md-4">
-<input class="form-control sensor-box" name="temperature" placeholder="Temperature">
-</div>
+    <div class="col-md-4">
+        <input class="form-control sensor-box" name="temperature" placeholder="Temperature">
+    </div>
 
-<div class="col-md-4">
-<input class="form-control sensor-box" name="ph" placeholder="pH">
-</div>
+    <div class="col-md-4">
+        <input class="form-control sensor-box" name="ph" placeholder="pH">
+    </div>
 
-<div class="col-md-4">
-<input class="form-control sensor-box" name="tds" placeholder="TDS">
+    <div class="col-md-4">
+        <input class="form-control sensor-box" name="tds" placeholder="TDS">
+    </div>
+
 </div>
 
 <!-- OCEAN ONLY -->
-<div id="oceanSensors">
+<div id="oceanSensors" class="row g-3 mt-1">
 
-<div class="col-md-4">
-<input class="form-control sensor-box" name="chlorophyll" placeholder="Chlorophyll">
-</div>
+    <div class="col-md-4">
+        <input class="form-control sensor-box" name="chlorophyll" placeholder="Chlorophyll">
+    </div>
 
-<div class="col-md-4">
-<input class="form-control sensor-box" name="ta" placeholder="Total Alkalinity">
-</div>
+    <div class="col-md-4">
+        <input class="form-control sensor-box" name="ta" placeholder="Total Alkalinity">
+    </div>
 
-<div class="col-md-4">
-<input class="form-control sensor-box" name="dic" placeholder="DIC">
-</div>
+    <div class="col-md-4">
+        <input class="form-control sensor-box" name="dic" placeholder="DIC">
+    </div>
 
 </div>
 
 <!-- POND ONLY -->
-<div id="pondSensors" style="display:none;">
+<div id="pondSensors" class="row g-3 mt-1" style="display:none;">
 
-<div class="col-md-4">
-<input class="form-control sensor-box" name="do" placeholder="Dissolved Oxygen">
-</div>
-
-</div>
+    <div class="col-md-4">
+        <input class="form-control sensor-box" name="do" placeholder="Dissolved Oxygen">
+    </div>
 
 </div>
 
@@ -170,13 +164,14 @@
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
 <script>
+
 let map = null;
 let marker = null;
 
-function toggleSensors(){
+function toggleSensors() {
     const type = document.getElementById("waterType").value;
 
-    if(type === "ocean"){
+    if (type === "ocean") {
         document.getElementById("oceanSensors").style.display = "flex";
         document.getElementById("pondSensors").style.display = "none";
     } else {
@@ -235,5 +230,6 @@ async function scanBLE() {
 function readSensor() {
     alert("ESP32 backend integration required.");
 }
+
 </script>
 {% endblock %}
