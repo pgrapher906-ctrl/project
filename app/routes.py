@@ -12,13 +12,17 @@ main = Blueprint('main', __name__)
 UPLOAD_FOLDER = "app/static/uploads"
 
 
-# ------------------ HOME ------------------
+# =========================
+# HOME
+# =========================
 @main.route("/")
 def home():
     return redirect(url_for("main.login"))
 
 
-# ------------------ LOGIN ------------------
+# =========================
+# LOGIN
+# =========================
 @main.route("/login", methods=["GET", "POST"])
 def login():
     form = LoginForm()
@@ -34,33 +38,36 @@ def login():
             user.last_login = datetime.utcnow()
             db.session.commit()
 
-            # 👉 Go to water selection page
             return redirect(url_for("main.select_water"))
-        else:
-            flash("Invalid email or password", "danger")
+
+        flash("Invalid email or password", "danger")
 
     return render_template("login.html", form=form)
 
 
-# ------------------ SELECT WATER TYPE ------------------
+# =========================
+# WATER SELECTION
+# =========================
 @main.route("/select_water", methods=["GET", "POST"])
 @login_required
 def select_water():
 
     if request.method == "POST":
-        selected_type = request.form.get("water_type")
+        selected = request.form.get("water_type")
 
-        if selected_type not in ["ocean", "pond"]:
-            flash("Please select valid water type", "danger")
+        if selected not in ["ocean", "pond"]:
+            flash("Please select valid water category.", "danger")
             return redirect(url_for("main.select_water"))
 
-        session["water_type"] = selected_type
+        session["water_type"] = selected
         return redirect(url_for("main.dashboard"))
 
     return render_template("select_water.html")
 
 
-# ------------------ DASHBOARD ------------------
+# =========================
+# DASHBOARD
+# =========================
 @main.route("/dashboard")
 @login_required
 def dashboard():
@@ -77,16 +84,20 @@ def dashboard():
     )
 
 
-# ------------------ LOGOUT ------------------
+# =========================
+# LOGOUT
+# =========================
 @main.route("/logout")
 @login_required
 def logout():
-    session.pop("water_type", None)  # clear selection
+    session.pop("water_type", None)
     logout_user()
     return redirect(url_for("main.login"))
 
 
-# ------------------ SAVE SENSOR DATA ------------------
+# =========================
+# SAVE DATA
+# =========================
 @main.route("/save_data", methods=["POST"])
 @login_required
 def save_data():
@@ -98,6 +109,14 @@ def save_data():
 
     data = request.form
 
+    # Validate required fields
+    if not data.get("latitude") or not data.get("longitude"):
+        return jsonify({"error": "Location is required"}), 400
+
+    if not data.get("pin_id"):
+        return jsonify({"error": "Pin ID is required"}), 400
+
+    # Ensure upload folder exists
     os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
     image = request.files.get("image")
@@ -112,9 +131,10 @@ def save_data():
     def to_float(value):
         try:
             return float(value) if value else None
-        except:
+        except (ValueError, TypeError):
             return None
 
+    # Build entry based on water type
     entry = WaterData(
         user_id=current_user.id,
         latitude=to_float(data.get("latitude")),
@@ -122,17 +142,17 @@ def save_data():
         water_type=water_type,
         pin_id=data.get("pin_id"),
 
-        # Ocean
+        # Ocean parameters
         chlorophyll=to_float(data.get("chlorophyll")) if water_type == "ocean" else None,
         ta=to_float(data.get("ta")) if water_type == "ocean" else None,
         dic=to_float(data.get("dic")) if water_type == "ocean" else None,
 
-        # Common
+        # Common parameters
         temperature=to_float(data.get("temperature")),
         ph=to_float(data.get("ph")),
         tds=to_float(data.get("tds")),
 
-        # Pond
+        # Pond parameter
         do=to_float(data.get("do")) if water_type == "pond" else None,
 
         image_path=image_path,
