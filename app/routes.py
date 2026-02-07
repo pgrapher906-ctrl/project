@@ -7,7 +7,7 @@ from app import db, bcrypt
 from app.models import User, WaterData
 from app.forms import LoginForm, RegistrationForm
 
-main = Blueprint('main', __name__)
+main = Blueprint("main", __name__)
 
 UPLOAD_FOLDER = "app/static/uploads"
 
@@ -46,7 +46,7 @@ def login():
 
 
 # =========================
-# WATER SELECTION
+# WATER SELECTION PAGE
 # =========================
 @main.route("/select_water", methods=["GET", "POST"])
 @login_required
@@ -74,12 +74,12 @@ def dashboard():
 
     water_type = session.get("water_type")
 
-    if not water_type:
+    # If user directly tries to access dashboard without selection
+    if water_type not in ["ocean", "pond"]:
         return redirect(url_for("main.select_water"))
 
     return render_template(
         "dashboard.html",
-        user=current_user,
         water_type=water_type
     )
 
@@ -104,25 +104,24 @@ def save_data():
 
     water_type = session.get("water_type")
 
-    if not water_type:
+    if water_type not in ["ocean", "pond"]:
         return jsonify({"error": "Water type not selected"}), 400
 
     data = request.form
 
-    # Validate required fields
+    # Required validations
     if not data.get("latitude") or not data.get("longitude"):
         return jsonify({"error": "Location is required"}), 400
 
     if not data.get("pin_id"):
         return jsonify({"error": "Pin ID is required"}), 400
 
-    # Ensure upload folder exists
     os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
     image = request.files.get("image")
     image_path = None
 
-    if image and image.filename != "":
+    if image and image.filename:
         filename = secure_filename(image.filename)
         save_path = os.path.join(UPLOAD_FOLDER, filename)
         image.save(save_path)
@@ -134,7 +133,6 @@ def save_data():
         except (ValueError, TypeError):
             return None
 
-    # Build entry based on water type
     entry = WaterData(
         user_id=current_user.id,
         latitude=to_float(data.get("latitude")),
@@ -142,17 +140,17 @@ def save_data():
         water_type=water_type,
         pin_id=data.get("pin_id"),
 
-        # Ocean parameters
+        # Ocean only
         chlorophyll=to_float(data.get("chlorophyll")) if water_type == "ocean" else None,
         ta=to_float(data.get("ta")) if water_type == "ocean" else None,
         dic=to_float(data.get("dic")) if water_type == "ocean" else None,
 
-        # Common parameters
+        # Common
         temperature=to_float(data.get("temperature")),
         ph=to_float(data.get("ph")),
         tds=to_float(data.get("tds")),
 
-        # Pond parameter
+        # Pond only
         do=to_float(data.get("do")) if water_type == "pond" else None,
 
         image_path=image_path,
