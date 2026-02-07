@@ -3,101 +3,12 @@
 
 {% block content %}
 
-<style>
-/* Background */
-body {
-    background: linear-gradient(to bottom, #5fb4d8, #8fd3f4);
-    background-attachment: fixed;
-}
-
-/* Center wrapper */
-.select-wrapper {
-    min-height: 85vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* Glass container */
-.select-container {
-    width: 100%;
-    max-width: 950px;
-    padding: 40px;
-    border-radius: 20px;
-    background: rgba(255, 255, 255, 0.75);
-    backdrop-filter: blur(15px);
-    box-shadow: 0 20px 50px rgba(0,0,0,0.15);
-}
-
-/* Title */
-.select-title {
-    text-align: center;
-    font-weight: 600;
-    margin-bottom: 40px;
-    color: #0A3D62;
-}
-
-/* Water cards */
-.water-card {
-    border-radius: 18px;
-    padding: 25px;
-    transition: all 0.3s ease;
-    background: linear-gradient(135deg, #ffffff, #f2fbff);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-}
-
-.water-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-}
-
-/* Image area */
-.water-preview {
-    height: 180px;
-    border-radius: 15px;
-    margin-bottom: 20px;
-    background-size: cover;
-    background-position: center;
-}
-
-/* Ocean image */
-.ocean-bg {
-    background-image: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e');
-}
-
-/* Pond image */
-.pond-bg {
-    background-image: url('https://images.unsplash.com/photo-1501785888041-af3ef285b470');
-}
-
-/* Button */
-.btn-select {
-    width: 100%;
-    padding: 10px;
-    border-radius: 10px;
-    font-weight: 500;
-    border: none;
-}
-
-.ocean-btn {
-    background: linear-gradient(90deg, #0A3D62, #1ABC9C);
-    color: white;
-}
-
-.pond-btn {
-    background: linear-gradient(90deg, #1ABC9C, #16A085);
-    color: white;
-}
-
-.btn-select:hover {
-    opacity: 0.9;
-}
-</style>
-
 <div class="select-wrapper">
-    <div class="select-container">
+    <div class="select-container glass-card">
 
-        <h2 class="select-title">Select Monitoring Location</h2>
+        <h2 class="select-title text-center mb-5">
+            Select Monitoring Location
+        </h2>
 
         <div class="row g-4">
 
@@ -105,15 +16,20 @@ body {
             <div class="col-md-6">
                 <div class="water-card text-center">
 
-                    <div class="water-preview ocean-bg"></div>
+                    <!-- LOCAL IMAGE -->
+                    <div class="water-preview"
+                         style="background-image: url('{{ url_for('static', filename='images/ocean.jpg') }}');">
+                    </div>
 
-                    <h4 class="mb-3" style="color:#0A3D62;">🌊 Ocean Monitoring</h4>
+                    <h4 class="mb-3 text-primary">
+                        🌊 Ocean Monitoring
+                    </h4>
 
                     <form method="POST">
                         <button type="submit"
                                 name="water_type"
                                 value="ocean"
-                                class="btn-select ocean-btn">
+                                class="btn btn-lg btn-success w-100">
                             Select Ocean
                         </button>
                     </form>
@@ -125,15 +41,20 @@ body {
             <div class="col-md-6">
                 <div class="water-card text-center">
 
-                    <div class="water-preview pond-bg"></div>
+                    <!-- LOCAL IMAGE -->
+                    <div class="water-preview"
+                         style="background-image: url('{{ url_for('static', filename='images/pond.jpg') }}');">
+                    </div>
 
-                    <h4 class="mb-3" style="color:#0A3D62;">🏞 Pond & Inland Monitoring</h4>
+                    <h4 class="mb-3 text-success">
+                        🏞 Pond & Inland Monitoring
+                    </h4>
 
                     <form method="POST">
                         <button type="submit"
                                 name="water_type"
                                 value="pond"
-                                class="btn-select pond-btn">
+                                class="btn btn-lg btn-success w-100">
                             Select Pond
                         </button>
                     </form>
@@ -145,5 +66,35 @@ body {
 
     </div>
 </div>
+
+<style>
+.select-wrapper {
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.water-card {
+    border-radius: 18px;
+    padding: 25px;
+    transition: all 0.3s ease;
+    background: rgba(255,255,255,0.95);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.water-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+}
+
+.water-preview {
+    height: 200px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    background-size: cover;
+    background-position: center;
+}
+</style>
 
 {% endblock %}
