@@ -11,6 +11,9 @@
     <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
+    <!-- ✅ LOAD YOUR CSS FILE -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
     <style>
         body {
             margin: 0;
@@ -69,7 +72,7 @@
             transform: translateY(-2px);
         }
 
-        /* GLASS CARD EFFECT */
+        /* GLASS CARD */
         .glass-card {
             background: rgba(255, 255, 255, 0.92);
             backdrop-filter: blur(12px);
@@ -104,20 +107,18 @@
             display: block;
         }
 
-        /* FLASH */
         .alert {
             border-radius: 12px;
         }
 
-        /* MOBILE */
         @media (max-width: 768px) {
-            body {
-                background-attachment: scroll;
+            .navbar {
+                padding: 10px 18px;
             }
 
             .glass-card,
             .dashboard-card {
-                padding: 22px;
+                padding: 25px;
             }
         }
     </style>
@@ -144,24 +145,12 @@
     </div>
 </nav>
 
-{% if current_user.is_authenticated %}
-<div id="userInfoPopup" class="info-popup">
-    <div class="mb-2"><strong>User:</strong> {{ current_user.username }}</div>
-    <div class="mb-2"><strong>Visits:</strong> {{ current_user.visit_count }}</div>
-    {% if current_user.last_login %}
-    <div>
-        <strong>Last Login:</strong><br>
-        {{ current_user.last_login.strftime("%d-%m-%Y %H:%M") }}
-    </div>
-    {% endif %}
-</div>
-{% endif %}
-
 <div class="container mt-5">
+
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             {% for category, message in messages %}
-                <div class="alert alert-{{ category }} alert-dismissible fade show mt-3">
+                <div class="alert alert-{{ category }} alert-dismissible fade show mt-3" role="alert">
                     {{ message }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
