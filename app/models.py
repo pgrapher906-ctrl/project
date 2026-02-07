@@ -3,9 +3,9 @@ from app import db
 from flask_login import UserMixin
 
 
-# =========================
+# ==========================================
 # USER TABLE
-# =========================
+# ==========================================
 class User(db.Model, UserMixin):
     __tablename__ = "users"
 
@@ -16,13 +16,13 @@ class User(db.Model, UserMixin):
 
     password_hash = db.Column(db.String(200), nullable=False)
 
-    # Visit Tracking
+    # ---- User Activity Tracking ----
     visit_count = db.Column(db.Integer, default=0)
     last_login = db.Column(db.DateTime)
 
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    # Relationship
+    # ---- Relationship ----
     water_entries = db.relationship(
         "WaterData",
         backref="user",
@@ -30,10 +30,14 @@ class User(db.Model, UserMixin):
         cascade="all, delete-orphan"
     )
 
+    def __repr__(self):
+        return f"<User {self.username}>"
 
-# =========================
+
+
+# ==========================================
 # WATER DATA TABLE
-# =========================
+# ==========================================
 class WaterData(db.Model):
     __tablename__ = "water_data"
 
@@ -41,39 +45,52 @@ class WaterData(db.Model):
 
     user_id = db.Column(
         db.Integer,
-        db.ForeignKey('users.id'),
+        db.ForeignKey("users.id"),
         nullable=False
     )
 
+    # Server timestamp (auto captured)
     timestamp = db.Column(
         db.DateTime,
-        default=datetime.utcnow
+        default=datetime.utcnow,
+        nullable=False
     )
 
-    # Location
-    latitude = db.Column(db.Float)
-    longitude = db.Column(db.Float)
-
-    water_type = db.Column(db.String(100))
-    pin_id = db.Column(db.String(100))
+    # -----------------------
+    # LOCATION
+    # -----------------------
+    latitude = db.Column(db.Float, nullable=False)
+    longitude = db.Column(db.Float, nullable=False)
 
     # -----------------------
-    # Ocean Parameters
+    # WATER TYPE & PIN
     # -----------------------
+    water_type = db.Column(db.String(100), nullable=False)
+    pin_id = db.Column(db.String(100), nullable=False)
+
+    # =======================
+    # OCEAN PARAMETERS
+    # =======================
     chlorophyll = db.Column(db.Float)
     ta = db.Column(db.Float)
     dic = db.Column(db.Float)
 
-    # -----------------------
-    # Common Parameters
-    # -----------------------
+    # =======================
+    # COMMON PARAMETERS
+    # =======================
     temperature = db.Column(db.Float)
     ph = db.Column(db.Float)
     tds = db.Column(db.Float)
 
-    # -----------------------
-    # Pond Parameter
-    # -----------------------
+    # =======================
+    # POND PARAMETER
+    # =======================
     do = db.Column(db.Float)
 
+    # -----------------------
+    # IMAGE
+    # -----------------------
     image_path = db.Column(db.String(300))
+
+    def __repr__(self):
+        return f"<WaterData {self.water_type} - {self.timestamp}>"
