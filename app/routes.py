@@ -1,11 +1,14 @@
 import os
 from datetime import datetime
-from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify, session
+from flask import Blueprint, render_template, redirect, url_for, flash, request, session
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.utils import secure_filename
 from app import db, bcrypt
 from app.models import User, WaterData
-from app.forms import LoginForm, RegistrationForm
+from app.forms import LoginForm
+
+# For Indian time (IST)
+import pytz
 
 main = Blueprint("main", __name__)
 
@@ -33,9 +36,8 @@ def login():
         if user and bcrypt.check_password_hash(user.password_hash, form.password.data):
             login_user(user)
 
-            # Update visit tracking
             user.visit_count = (user.visit_count or 0) + 1
-            user.last_login = datetime.utcnow()
+            user.last_login = datetime.now(pytz.timezone("Asia/Kolkata"))
             db.session.commit()
 
             return redirect(url_for("main.select_water"))
@@ -74,14 +76,10 @@ def dashboard():
 
     water_type = session.get("water_type")
 
-    # If user directly tries to access dashboard without selection
     if water_type not in ["ocean", "pond"]:
         return redirect(url_for("main.select_water"))
 
-    return render_template(
-        "dashboard.html",
-        water_type=water_type
-    )
+    return render_template("dashboard.html", water_type=water_type)
 
 
 # =========================
@@ -96,7 +94,7 @@ def logout():
 
 
 # =========================
-# SAVE DATA
+# SAVE DATA (FIXED)
 # =========================
 @main.route("/save_data", methods=["POST"])
 @login_required
@@ -105,16 +103,18 @@ def save_data():
     water_type = session.get("water_type")
 
     if water_type not in ["ocean", "pond"]:
-        return jsonify({"error": "Water type not selected"}), 400
+        flash("Water type not selected.", "danger")
+        return redirect(url_for("main.select_water"))
 
     data = request.form
 
-    # Required validations
     if not data.get("latitude") or not data.get("longitude"):
-        return jsonify({"error": "Location is required"}), 400
+        flash("Location is required.", "danger")
+        return redirect(url_for("main.dashboard"))
 
     if not data.get("pin_id"):
-        return jsonify({"error": "Pin ID is required"}), 400
+        flash("Pin ID is required.", "danger")
+        return redirect(url_for("main.dashboard"))
 
     os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
@@ -130,8 +130,12 @@ def save_data():
     def to_float(value):
         try:
             return float(value) if value else None
-        except (ValueError, TypeError):
+        except:
             return None
+
+    # IST TIME FIX
+    ist = pytz.timezone("Asia/Kolkata")
+    current_time = datetime.now(ist)
 
     entry = WaterData(
         user_id=current_user.id,
@@ -140,24 +144,21 @@ def save_data():
         water_type=water_type,
         pin_id=data.get("pin_id"),
 
-        # Ocean only
         chlorophyll=to_float(data.get("chlorophyll")) if water_type == "ocean" else None,
         ta=to_float(data.get("ta")) if water_type == "ocean" else None,
         dic=to_float(data.get("dic")) if water_type == "ocean" else None,
 
-        # Common
         temperature=to_float(data.get("temperature")),
         ph=to_float(data.get("ph")),
         tds=to_float(data.get("tds")),
-
-        # Pond only
         do=to_float(data.get("do")) if water_type == "pond" else None,
 
         image_path=image_path,
-        timestamp=datetime.utcnow()
+        timestamp=current_time
     )
 
     db.session.add(entry)
     db.session.commit()
 
-    return jsonify({"status": "success"})
+    flash("Water data saved successfully ✔", "success")
+    return redirect(url_for("main.dashboard"))
