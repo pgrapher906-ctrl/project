@@ -26,6 +26,7 @@
             background-attachment: fixed;
         }
 
+        /* NAVBAR */
         .navbar {
             background: linear-gradient(90deg, #0A3D62, #145374);
             padding: 14px 28px;
@@ -39,7 +40,6 @@
             color: white !important;
             display: flex;
             align-items: center;
-            cursor: pointer;
         }
 
         .navbar-brand img {
@@ -53,6 +53,12 @@
             gap: 18px;
             color: white;
             font-size: 14px;
+            position: relative;
+        }
+
+        .profile-name {
+            cursor: pointer;
+            font-weight: 500;
         }
 
         .logout-btn {
@@ -71,11 +77,11 @@
             transform: translateY(-2px);
         }
 
-        /* USER POPUP */
+        /* USER POPUP (RIGHT SIDE UNDER PROFILE) */
         .info-popup {
             position: absolute;
-            top: 70px;
-            left: 30px;
+            top: 50px;
+            right: 0;
             background: white;
             color: #0A3D62;
             padding: 18px 22px;
@@ -88,6 +94,12 @@
 
         .info-popup.show {
             display: block;
+            animation: fadeIn 0.2s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-6px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .alert {
@@ -109,34 +121,39 @@
 <nav class="navbar navbar-dark">
     <div class="container-fluid d-flex justify-content-between align-items-center">
 
-        <!-- CLICKABLE LOGO -->
-        <div class="navbar-brand" onclick="toggleUserInfo(event)">
+        <!-- LOGO (NO POPUP HERE NOW) -->
+        <div class="navbar-brand">
             <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo">
             Smart Water Monitoring
         </div>
 
         {% if current_user.is_authenticated %}
         <div class="nav-right">
-            👤 {{ current_user.username }}
+
+            <!-- PROFILE CLICK -->
+            <div class="profile-name" onclick="toggleUserInfo(event)">
+                👤 {{ current_user.username }}
+            </div>
+
+            <!-- POPUP -->
+            <div id="userInfoPopup" class="info-popup">
+                <div><strong>User:</strong> {{ current_user.username }}</div>
+                <div><strong>Visits:</strong> {{ current_user.visit_count }}</div>
+
+                {% if current_user.last_login %}
+                <div style="margin-top:8px;">
+                    <strong>Last Login:</strong><br>
+                    {{ current_user.last_login.strftime("%d-%m-%Y %H:%M") }}
+                </div>
+                {% endif %}
+            </div>
+
             <a href="{{ url_for('main.logout') }}" class="logout-btn">Logout</a>
+
         </div>
         {% endif %}
     </div>
 </nav>
-
-<!-- USER INFO POPUP -->
-{% if current_user.is_authenticated %}
-<div id="userInfoPopup" class="info-popup">
-    <div><strong>User:</strong> {{ current_user.username }}</div>
-    <div><strong>Visits:</strong> {{ current_user.visit_count }}</div>
-    {% if current_user.last_login %}
-    <div style="margin-top:8px;">
-        <strong>Last Login:</strong><br>
-        {{ current_user.last_login.strftime("%d-%m-%Y %H:%M") }}
-    </div>
-    {% endif %}
-</div>
-{% endif %}
 
 <div class="container mt-5">
 
