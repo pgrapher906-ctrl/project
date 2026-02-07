@@ -1,195 +1,3 @@
-{% extends 'base.html' %}
-{% block title %}Dashboard{% endblock %}
-
-{% block head %}
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
-
-<style>
-#map {
-    height: 300px;
-    border-radius: 14px;
-    margin-bottom: 20px;
-}
-
-.section-title {
-    font-weight: 600;
-    margin-top: 30px;
-    margin-bottom: 12px;
-    color: #0A3D62;
-    border-left: 4px solid #1ABC9C;
-    padding-left: 10px;
-}
-
-.readonly {
-    background-color: #EDF2F7;
-}
-
-.mode-badge {
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 13px;
-    letter-spacing: 0.5px;
-}
-
-.status-indicator {
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 13px;
-    display: inline-block;
-}
-
-.status-connected {
-    background: #E8F8F5;
-    color: #1ABC9C;
-}
-
-.status-disconnected {
-    background: #FDEDEC;
-    color: #E74C3C;
-}
-
-.dashboard-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 20px;
-}
-
-.dashboard-logo {
-    width: 45px;
-}
-</style>
-{% endblock %}
-
-{% block content %}
-<div class="container mt-4">
-
-<!-- HEADER WITH SMALL LOGO -->
-<div class="dashboard-header">
-    <img src="{{ url_for('static', filename='images/logo.png') }}" class="dashboard-logo" alt="Logo">
-    <div>
-        <h4 class="mb-1">Water Quality Data Entry</h4>
-
-        {% if water_type == "ocean" %}
-            <span class="mode-badge bg-primary text-white">
-                Ocean Monitoring Mode
-            </span>
-        {% elif water_type == "pond" %}
-            <span class="mode-badge bg-success text-white">
-                Inland / Pond Monitoring Mode
-            </span>
-        {% endif %}
-    </div>
-</div>
-
-<form method="POST" action="/save_data" enctype="multipart/form-data">
-
-<!-- STEP 1 LOCATION -->
-<div class="section-title">Step 1 – Detect Location</div>
-<button type="button" class="btn btn-primary btn-sm mb-2" onclick="getLocation()">
-    Detect Location
-</button>
-
-<div id="map"></div>
-
-<input type="hidden" name="latitude" id="latitude">
-<input type="hidden" name="longitude" id="longitude">
-
-<!-- STEP 2 WATER TYPE -->
-<div class="section-title">Step 2 – Water Type</div>
-<select class="form-select mb-3" name="water_type" required>
-
-    {% if water_type == "ocean" %}
-        <option value="">Select Water Type</option>
-        <option>Open Ocean Water</option>
-        <option>Coastal Water</option>
-        <option>Estuarine Water</option>
-        <option>Deep Sea Water</option>
-        <option>Marine Surface Water</option>
-    {% elif water_type == "pond" %}
-        <option value="">Select Water Type</option>
-        <option>Pond Water</option>
-        <option>Drinking Water</option>
-        <option>Ground Water</option>
-    {% endif %}
-
-</select>
-
-<!-- STEP 3 PIN -->
-<div class="section-title">Step 3 – Pin Identification</div>
-<input type="text" class="form-control mb-3" name="pin_id" placeholder="Enter Monitoring Pin ID" required>
-
-<!-- STEP 4 BLUETOOTH -->
-<div class="section-title">Step 4 – Bluetooth Device Connection</div>
-
-<button type="button" class="btn btn-outline-primary btn-sm" onclick="scanBLE()">
-    Scan Nearby BLE Devices
-</button>
-
-<p class="mt-2">
-    Status:
-    <span id="bleStatus" class="status-indicator status-disconnected">
-        Not Connected
-    </span>
-</p>
-
-<!-- STEP 5 SENSOR DATA -->
-<div class="section-title">Step 5 – Sensor Data Acquisition</div>
-
-<button type="button" class="btn btn-primary btn-sm mb-3" onclick="readSensor()">
-    Read Sensor Data
-</button>
-
-<div class="row g-3">
-
-    <!-- COMMON -->
-    <div class="col-md-4">
-        <input class="form-control readonly" name="temperature" placeholder="Temperature (°C)" readonly>
-    </div>
-
-    <div class="col-md-4">
-        <input class="form-control readonly" name="ph" placeholder="pH" readonly>
-    </div>
-
-    <div class="col-md-4">
-        <input class="form-control readonly" name="tds" placeholder="TDS (mg/L)" readonly>
-    </div>
-
-    {% if water_type == "ocean" %}
-        <div class="col-md-4">
-            <input class="form-control readonly" name="chlorophyll" placeholder="Chlorophyll (µg/L)" readonly>
-        </div>
-
-        <div class="col-md-4">
-            <input class="form-control readonly" name="ta" placeholder="Total Alkalinity (TA)" readonly>
-        </div>
-
-        <div class="col-md-4">
-            <input class="form-control readonly" name="dic" placeholder="Dissolved Inorganic Carbon (DIC)" readonly>
-        </div>
-    {% endif %}
-
-    {% if water_type == "pond" %}
-        <div class="col-md-4">
-            <input class="form-control readonly" name="do" placeholder="Dissolved Oxygen (DO mg/L)" readonly>
-        </div>
-    {% endif %}
-
-</div>
-
-<!-- STEP 6 IMAGE -->
-<div class="section-title">Step 6 – Upload Monitoring Image</div>
-<input type="file" class="form-control mb-3" name="image">
-
-<button type="submit" class="btn btn-success mt-3">
-    Save Data
-</button>
-
-</form>
-</div>
-{% endblock %}
-
-
 {% block scripts %}
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
@@ -198,21 +6,38 @@
 let map;
 let marker;
 
-// LOCATION
+// ===============================
+// LOCATION (MOBILE SAFE)
+// ===============================
 function getLocation() {
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function(position) {
 
-            const lat = position.coords.latitude;
-            const lon = position.coords.longitude;
+    if (!navigator.geolocation) {
+        alert("Geolocation not supported.");
+        return;
+    }
 
-            document.getElementById("latitude").value = lat;
-            document.getElementById("longitude").value = lon;
+    navigator.geolocation.getCurrentPosition(function(position) {
+
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+
+        document.getElementById("latitude").value = lat;
+        document.getElementById("longitude").value = lon;
+
+        // Small delay ensures proper render on mobile
+        setTimeout(() => {
 
             if (!map) {
                 map = L.map('map').setView([lat, lon], 13);
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png')
-                    .addTo(map);
+
+                L.tileLayer(
+                    'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                    {
+                        attribution: '&copy; OpenStreetMap contributors'
+                    }
+                ).addTo(map);
+            } else {
+                map.setView([lat, lon], 13);
             }
 
             if (marker) {
@@ -221,38 +46,55 @@ function getLocation() {
                 marker = L.marker([lat, lon]).addTo(map);
             }
 
-        }, function() {
-            alert("Location permission denied.");
-        });
-    }
+            map.invalidateSize(); // IMPORTANT for mobile render fix
+
+        }, 300);
+
+    }, function(error) {
+        alert("Location permission denied.");
+    });
 }
 
 
-// BLUETOOTH
+// ===============================
+// BLUETOOTH (REAL SCAN STYLE)
+// ===============================
 async function scanBLE() {
+
+    const status = document.getElementById("bleStatus");
+
     try {
+
+        // For real ESP32 you can later add:
+        // filters: [{ namePrefix: "ESP" }]
+
         const device = await navigator.bluetooth.requestDevice({
-            acceptAllDevices: true
+            acceptAllDevices: true,
+            optionalServices: []
         });
 
-        const status = document.getElementById("bleStatus");
-        status.innerText = "Connected to " + (device.name || "Device");
+        status.innerText = "Connected to " + (device.name || "Unnamed Device");
         status.classList.remove("status-disconnected");
         status.classList.add("status-connected");
 
+        console.log("Connected device:", device);
+
     } catch (error) {
 
-        const status = document.getElementById("bleStatus");
         status.innerText = "Not Connected";
         status.classList.remove("status-connected");
         status.classList.add("status-disconnected");
+
+        console.log("Bluetooth Error:", error);
     }
 }
 
 
-// SENSOR
+// ===============================
+// SENSOR (PLACEHOLDER)
+// ===============================
 function readSensor() {
-    alert("Sensor integration will activate after ESP32 backend integration.");
+    alert("ESP32 backend integration required for live sensor data.");
 }
 
 </script>
