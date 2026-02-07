@@ -8,11 +8,9 @@ body {
     min-height: 100vh;
 
     background: linear-gradient(rgba(10,61,98,0.75), rgba(10,61,98,0.75)),
-                url("../images/water-bg.jpg");
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
+                url("../images/water-bg.jpg") no-repeat center center fixed;
 
+    background-size: cover;
     color: #0A3D62;
 }
 
@@ -78,7 +76,8 @@ main {
 =================================== */
 
 .card {
-    background: rgba(255,255,255,0.95);
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(12px);
     border-radius: 20px;
     box-shadow: 0 20px 40px rgba(0,0,0,0.15);
     padding: 35px;
@@ -132,8 +131,6 @@ h2 {
 =================================== */
 
 .btn {
-    background: #0A3D62;
-    color: white;
     border: none;
     padding: 10px 20px;
     border-radius: 8px;
@@ -142,12 +139,9 @@ h2 {
     transition: 0.3s ease;
 }
 
-.btn:hover {
-    background: #08314F;
-}
-
 .btn-primary {
     background: #1ABC9C;
+    color: white;
 }
 
 .btn-primary:hover {
@@ -193,7 +187,7 @@ h2 {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 75vh;
+    min-height: 80vh;
 }
 
 
