@@ -1,64 +1,149 @@
 {% extends 'base.html' %}
-{% block title %}Select Water Monitoring Category{% endblock %}
+{% block title %}Select Monitoring Type | Smart Water Monitoring{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
 
-    <div class="text-center mb-5">
-        <h2 class="fw-bold" style="color:#0A3D62;">
-            Select Water Monitoring Category
-        </h2>
-    </div>
+<style>
+/* Background */
+body {
+    background: linear-gradient(to bottom, #5fb4d8, #8fd3f4);
+    background-attachment: fixed;
+}
 
-    <div class="row justify-content-center g-4">
+/* Center wrapper */
+.select-wrapper {
+    min-height: 85vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
-        <!-- OCEAN CARD -->
-        <div class="col-md-5">
-            <div class="card border-0 shadow-lg p-4 text-center h-100">
+/* Glass container */
+.select-container {
+    width: 100%;
+    max-width: 950px;
+    padding: 40px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(15px);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+}
 
-                <div style="font-size:55px;">🌊</div>
+/* Title */
+.select-title {
+    text-align: center;
+    font-weight: 600;
+    margin-bottom: 40px;
+    color: #0A3D62;
+}
 
-                <h4 class="mt-3 mb-4 fw-semibold" style="color:#0A3D62;">
-                    Ocean Water Monitoring
-                </h4>
+/* Water cards */
+.water-card {
+    border-radius: 18px;
+    padding: 25px;
+    transition: all 0.3s ease;
+    background: linear-gradient(135deg, #ffffff, #f2fbff);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
 
-                <form method="POST">
-                    <button type="submit"
-                            name="water_type"
-                            value="ocean"
-                            class="btn w-100"
-                            style="background:#0A3D62;color:white;border-radius:8px;">
-                        Enter Ocean Monitoring
-                    </button>
-                </form>
+.water-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+}
 
+/* Image area */
+.water-preview {
+    height: 180px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    background-size: cover;
+    background-position: center;
+}
+
+/* Ocean image */
+.ocean-bg {
+    background-image: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e');
+}
+
+/* Pond image */
+.pond-bg {
+    background-image: url('https://images.unsplash.com/photo-1501785888041-af3ef285b470');
+}
+
+/* Button */
+.btn-select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 10px;
+    font-weight: 500;
+    border: none;
+}
+
+.ocean-btn {
+    background: linear-gradient(90deg, #0A3D62, #1ABC9C);
+    color: white;
+}
+
+.pond-btn {
+    background: linear-gradient(90deg, #1ABC9C, #16A085);
+    color: white;
+}
+
+.btn-select:hover {
+    opacity: 0.9;
+}
+</style>
+
+<div class="select-wrapper">
+    <div class="select-container">
+
+        <h2 class="select-title">Select Monitoring Location</h2>
+
+        <div class="row g-4">
+
+            <!-- OCEAN CARD -->
+            <div class="col-md-6">
+                <div class="water-card text-center">
+
+                    <div class="water-preview ocean-bg"></div>
+
+                    <h4 class="mb-3" style="color:#0A3D62;">🌊 Ocean Monitoring</h4>
+
+                    <form method="POST">
+                        <button type="submit"
+                                name="water_type"
+                                value="ocean"
+                                class="btn-select ocean-btn">
+                            Select Ocean
+                        </button>
+                    </form>
+
+                </div>
             </div>
+
+            <!-- POND CARD -->
+            <div class="col-md-6">
+                <div class="water-card text-center">
+
+                    <div class="water-preview pond-bg"></div>
+
+                    <h4 class="mb-3" style="color:#0A3D62;">🏞 Pond & Inland Monitoring</h4>
+
+                    <form method="POST">
+                        <button type="submit"
+                                name="water_type"
+                                value="pond"
+                                class="btn-select pond-btn">
+                            Select Pond
+                        </button>
+                    </form>
+
+                </div>
+            </div>
+
         </div>
 
-        <!-- POND CARD -->
-        <div class="col-md-5">
-            <div class="card border-0 shadow-lg p-4 text-center h-100">
-
-                <div style="font-size:55px;">🏞</div>
-
-                <h4 class="mt-3 mb-4 fw-semibold" style="color:#1ABC9C;">
-                    Pond & Inland Water Monitoring
-                </h4>
-
-                <form method="POST">
-                    <button type="submit"
-                            name="water_type"
-                            value="pond"
-                            class="btn w-100"
-                            style="background:#1ABC9C;color:white;border-radius:8px;">
-                        Enter Inland Monitoring
-                    </button>
-                </form>
-
-            </div>
-        </div>
-
     </div>
-
 </div>
+
 {% endblock %}
