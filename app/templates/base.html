@@ -8,39 +8,45 @@
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
     <style>
         body {
-            background-color: #F4F6F9;
-            font-family: 'Segoe UI', sans-serif;
             margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #e6f2f8, #f4f9fc);
+            min-height: 100vh;
         }
 
-        /* NAVBAR */
+        /* ================= NAVBAR ================= */
         .navbar {
-            background: #0A3D62;
-            padding: 10px 20px;
+            background: linear-gradient(90deg, #0A3D62, #145374);
+            padding: 12px 24px;
             position: relative;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
         }
 
         .navbar-brand {
             font-weight: 600;
-            font-size: 16px;
+            font-size: 17px;
             color: white !important;
             display: flex;
             align-items: center;
             cursor: pointer;
+            letter-spacing: 0.5px;
         }
 
         .navbar-brand img {
-            height: 26px;
-            margin-right: 8px;
+            height: 28px;
+            margin-right: 10px;
         }
 
         /* RIGHT SIDE */
         .nav-right {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 18px;
             color: white;
             font-size: 14px;
         }
@@ -49,53 +55,73 @@
             background: #1ABC9C;
             border: none;
             color: white;
-            padding: 5px 14px;
-            border-radius: 6px;
+            padding: 6px 16px;
+            border-radius: 8px;
             font-size: 13px;
+            font-weight: 500;
             text-decoration: none;
+            transition: 0.2s ease;
         }
 
         .logout-btn:hover {
-            background: #17A589;
+            background: #17a589;
+            transform: translateY(-1px);
         }
 
-        /* USER INFO POPUP */
+        /* ================= USER POPUP ================= */
         .info-popup {
             position: absolute;
-            top: 60px;
-            right: 20px;
+            top: 65px;
+            right: 25px;
             background: white;
             color: #0A3D62;
-            padding: 16px 20px;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            padding: 18px 22px;
+            border-radius: 14px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
             display: none;
-            min-width: 240px;
+            min-width: 260px;
             font-size: 14px;
             z-index: 1000;
         }
 
+        .info-popup strong {
+            color: #0A3D62;
+        }
+
         .info-popup.show {
             display: block;
-            animation: fadeIn 0.2s ease-in-out;
+            animation: fadeIn 0.25s ease-in-out;
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-8px); }
+            from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
+        /* ================= DASHBOARD CARD ================= */
         .dashboard-card {
-            border-radius: 14px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
-            padding: 30px;
+            border-radius: 18px;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+            padding: 32px;
             background: white;
+            backdrop-filter: blur(10px);
         }
 
+        /* FLASH */
+        .alert {
+            border-radius: 10px;
+        }
+
+        /* MOBILE */
         @media (max-width: 768px) {
             .nav-right {
                 gap: 10px;
                 font-size: 12px;
+            }
+
+            .info-popup {
+                right: 15px;
+                min-width: 220px;
             }
         }
     </style>
@@ -108,6 +134,7 @@
 <nav class="navbar navbar-dark">
     <div class="container-fluid d-flex justify-content-between align-items-center">
 
+        <!-- LOGO -->
         <div class="navbar-brand" onclick="toggleUserInfo(event)">
             <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo">
             Smart Water Monitoring
@@ -127,8 +154,8 @@
 <!-- USER INFO POPUP -->
 {% if current_user.is_authenticated %}
 <div id="userInfoPopup" class="info-popup">
-    <div><strong>User:</strong> {{ current_user.username }}</div>
-    <div><strong>Visits:</strong> {{ current_user.visit_count }}</div>
+    <div class="mb-2"><strong>User:</strong> {{ current_user.username }}</div>
+    <div class="mb-2"><strong>Visits:</strong> {{ current_user.visit_count }}</div>
     {% if current_user.last_login %}
     <div>
         <strong>Last Login:</strong><br>
@@ -168,7 +195,6 @@ function toggleUserInfo(event) {
 }
 
 document.addEventListener("DOMContentLoaded", function() {
-
     const popup = document.getElementById("userInfoPopup");
 
     if (popup) {
@@ -180,7 +206,6 @@ document.addEventListener("DOMContentLoaded", function() {
             popup.classList.remove("show");
         });
     }
-
 });
 </script>
 
