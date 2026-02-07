@@ -47,7 +47,7 @@
         <div class="section-title">Step 2 – Water Type</div>
         <select class="form-select" id="water_type" name="water_type" required onchange="toggleParameters()">
             <option value="">Select Water Type</option>
-            <option value="ocean">Open Ocean Water</option>
+            <option value="ocean">Ocean Water</option>
             <option value="pond">Pond Water</option>
         </select>
 
@@ -125,10 +125,72 @@
 let map;
 let marker;
 
-// ---------------- LOCATION ----------------
+// LOCATION
 function getLocation() {
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function(position) {
 
             const lat = position.coords.latitude;
-            const lon = position.coords.longitude recognize this conversation?
+            const lon = position.coords.longitude;
+
+            document.getElementById("latitude").value = lat;
+            document.getElementById("longitude").value = lon;
+
+            if (!map) {
+                map = L.map('map').setView([lat, lon], 13);
+
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap'
+                }).addTo(map);
+            }
+
+            if (marker) {
+                marker.setLatLng([lat, lon]);
+            } else {
+                marker = L.marker([lat, lon]).addTo(map);
+            }
+
+        }, function() {
+            alert("Location permission denied.");
+        });
+    }
+}
+
+// PARAMETER SWITCH
+function toggleParameters() {
+    const type = document.getElementById("water_type").value;
+
+    const oceanFields = document.querySelectorAll(".ocean-field");
+    const pondFields = document.querySelectorAll(".pond-field");
+
+    oceanFields.forEach(el => el.classList.add("d-none"));
+    pondFields.forEach(el => el.classList.add("d-none"));
+
+    if (type === "ocean") {
+        oceanFields.forEach(el => el.classList.remove("d-none"));
+    }
+
+    if (type === "pond") {
+        pondFields.forEach(el => el.classList.remove("d-none"));
+    }
+}
+
+// BLUETOOTH
+async function scanBLE() {
+    try {
+        const device = await navigator.bluetooth.requestDevice({
+            acceptAllDevices: true
+        });
+        document.getElementById("bleStatus").innerText =
+            "Connected to " + (device.name || "Device");
+    } catch (error) {
+        document.getElementById("bleStatus").innerText = "Not Connected";
+    }
+}
+
+// SENSOR
+function readSensor() {
+    alert("Sensor integration pending.");
+}
+</script>
+{% endblock %}
