@@ -3,8 +3,126 @@
 
 {% block content %}
 
+<style>
+
+/* =========================================
+   WATER BACKGROUND ANIMATION
+========================================= */
+
+.select-wrapper {
+    position: relative;
+    min-height: 85vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+/* animated water glow */
+.select-wrapper::before {
+    content: "";
+    position: absolute;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at 50% 50%, rgba(26,188,156,0.15), transparent 60%);
+    animation: waterMove 15s linear infinite;
+}
+
+@keyframes waterMove {
+    0% { transform: translate(-10%, -10%) rotate(0deg); }
+    50% { transform: translate(-5%, -5%) rotate(180deg); }
+    100% { transform: translate(-10%, -10%) rotate(360deg); }
+}
+
+/* =========================================
+   GLASS CONTAINER
+========================================= */
+
+.select-container {
+    position: relative;
+    width: 100%;
+    max-width: 1000px;
+    padding: 45px;
+    border-radius: 25px;
+    background: rgba(255, 255, 255, 0.90);
+    backdrop-filter: blur(15px);
+    box-shadow: 0 25px 60px rgba(0,0,0,0.25);
+    z-index: 10;
+}
+
+.select-title {
+    font-weight: 600;
+    color: #0A3D62;
+}
+
+/* =========================================
+   WATER CARDS
+========================================= */
+
+.water-card {
+    border-radius: 22px;
+    padding: 25px;
+    transition: all 0.35s ease;
+    background: rgba(255,255,255,0.95);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+    cursor: pointer;
+}
+
+.water-card:hover {
+    transform: translateY(-12px);
+    box-shadow: 0 30px 60px rgba(0,0,0,0.25);
+}
+
+/* image preview */
+.water-preview {
+    height: 220px;
+    border-radius: 18px;
+    margin-bottom: 20px;
+    background-size: cover;
+    background-position: center;
+    transition: transform 0.4s ease;
+}
+
+.water-card:hover .water-preview {
+    transform: scale(1.05);
+}
+
+/* =========================================
+   BUTTONS
+========================================= */
+
+.btn-ocean {
+    background: linear-gradient(90deg, #0A3D62, #1ABC9C);
+    border: none;
+    color: white;
+    font-weight: 500;
+    border-radius: 12px;
+    padding: 12px;
+    transition: 0.3s ease;
+}
+
+.btn-ocean:hover {
+    transform: translateY(-3px);
+}
+
+.btn-pond {
+    background: linear-gradient(90deg, #1ABC9C, #16A085);
+    border: none;
+    color: white;
+    font-weight: 500;
+    border-radius: 12px;
+    padding: 12px;
+    transition: 0.3s ease;
+}
+
+.btn-pond:hover {
+    transform: translateY(-3px);
+}
+
+</style>
+
 <div class="select-wrapper">
-    <div class="select-container glass-card">
+    <div class="select-container">
 
         <h2 class="select-title text-center mb-5">
             Select Monitoring Location
@@ -16,12 +134,11 @@
             <div class="col-md-6">
                 <div class="water-card text-center">
 
-                    <!-- LOCAL IMAGE -->
                     <div class="water-preview"
                          style="background-image: url('{{ url_for('static', filename='images/ocean.jpg') }}');">
                     </div>
 
-                    <h4 class="mb-3 text-primary">
+                    <h4 class="mb-4 text-primary fw-semibold">
                         🌊 Ocean Monitoring
                     </h4>
 
@@ -29,8 +146,8 @@
                         <button type="submit"
                                 name="water_type"
                                 value="ocean"
-                                class="btn btn-lg btn-success w-100">
-                            Select Ocean
+                                class="btn btn-ocean w-100">
+                            Enter Ocean Monitoring
                         </button>
                     </form>
 
@@ -41,12 +158,11 @@
             <div class="col-md-6">
                 <div class="water-card text-center">
 
-                    <!-- LOCAL IMAGE -->
                     <div class="water-preview"
                          style="background-image: url('{{ url_for('static', filename='images/pond.jpg') }}');">
                     </div>
 
-                    <h4 class="mb-3 text-success">
+                    <h4 class="mb-4 text-success fw-semibold">
                         🏞 Pond & Inland Monitoring
                     </h4>
 
@@ -54,8 +170,8 @@
                         <button type="submit"
                                 name="water_type"
                                 value="pond"
-                                class="btn btn-lg btn-success w-100">
-                            Select Pond
+                                class="btn btn-pond w-100">
+                            Enter Pond Monitoring
                         </button>
                     </form>
 
@@ -66,35 +182,5 @@
 
     </div>
 </div>
-
-<style>
-.select-wrapper {
-    min-height: 80vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.water-card {
-    border-radius: 18px;
-    padding: 25px;
-    transition: all 0.3s ease;
-    background: rgba(255,255,255,0.95);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-}
-
-.water-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-}
-
-.water-preview {
-    height: 200px;
-    border-radius: 15px;
-    margin-bottom: 20px;
-    background-size: cover;
-    background-position: center;
-}
-</style>
 
 {% endblock %}
