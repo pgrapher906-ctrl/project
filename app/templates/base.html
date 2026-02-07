@@ -19,6 +19,7 @@
         .navbar {
             background: #0A3D62;
             padding: 10px 20px;
+            position: relative;
         }
 
         .navbar-brand {
@@ -35,7 +36,7 @@
             margin-right: 8px;
         }
 
-        /* USER RIGHT SECTION */
+        /* RIGHT SIDE */
         .nav-right {
             display: flex;
             align-items: center;
@@ -64,13 +65,13 @@
             right: 20px;
             background: white;
             color: #0A3D62;
-            padding: 15px 20px;
+            padding: 16px 20px;
             border-radius: 12px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.15);
             display: none;
             min-width: 240px;
             font-size: 14px;
-            z-index: 999;
+            z-index: 1000;
         }
 
         .info-popup.show {
@@ -105,7 +106,7 @@
 <body>
 
 <nav class="navbar navbar-dark">
-    <div class="container-fluid d-flex justify-content-between">
+    <div class="container-fluid d-flex justify-content-between align-items-center">
 
         <!-- LOGO (CLICK TO SHOW INFO) -->
         <div class="navbar-brand" onclick="toggleUserInfo(event)">
@@ -116,13 +117,11 @@
         {% if current_user.is_authenticated %}
         <div class="nav-right">
             👤 {{ current_user.username }}
-
             <a href="{{ url_for('main.logout') }}" class="logout-btn">
                 Logout
             </a>
         </div>
         {% endif %}
-
     </div>
 </nav>
 
@@ -153,10 +152,15 @@ function toggleUserInfo(event) {
     }
 }
 
-// Close popup if clicking outside
-document.addEventListener("click", function(e) {
+// Prevent popup close when clicking inside it
+document.getElementById("userInfoPopup")?.addEventListener("click", function(e) {
+    e.stopPropagation();
+});
+
+// Close popup when clicking outside
+document.addEventListener("click", function() {
     const popup = document.getElementById("userInfoPopup");
-    if (popup && popup.classList.contains("show")) {
+    if (popup) {
         popup.classList.remove("show");
     }
 });
