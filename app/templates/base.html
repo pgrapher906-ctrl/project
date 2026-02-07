@@ -74,8 +74,8 @@
         /* USER POPUP */
         .info-popup {
             position: absolute;
-            top: 75px;
-            right: 30px;
+            top: 70px;
+            left: 30px;
             background: white;
             color: #0A3D62;
             padding: 18px 22px;
@@ -130,7 +130,7 @@
     <div><strong>User:</strong> {{ current_user.username }}</div>
     <div><strong>Visits:</strong> {{ current_user.visit_count }}</div>
     {% if current_user.last_login %}
-    <div>
+    <div style="margin-top:8px;">
         <strong>Last Login:</strong><br>
         {{ current_user.last_login.strftime("%d-%m-%Y %H:%M") }}
     </div>
@@ -165,7 +165,6 @@ function toggleUserInfo(event) {
     }
 }
 
-// Close when clicking outside
 document.addEventListener("click", function() {
     const popup = document.getElementById("userInfoPopup");
     if (popup) {
