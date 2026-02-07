@@ -1,17 +1,22 @@
-import os
+    import os
 from datetime import datetime
+import pytz
+
 from flask import Blueprint, render_template, redirect, url_for, flash, request, session
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.utils import secure_filename
+
 from app import db, bcrypt
 from app.models import User, WaterData
 from app.forms import LoginForm, RegistrationForm
 
-import pytz
 
 main = Blueprint("main", __name__)
 
 UPLOAD_FOLDER = "app/static/uploads"
+
+# Indian Timezone
+IST = pytz.timezone("Asia/Kolkata")
 
 
 # =========================
@@ -23,25 +28,29 @@ def home():
 
 
 # =========================
-# REGISTER  ✅ ADDED
+# REGISTER
 # =========================
 @main.route("/register", methods=["GET", "POST"])
 def register():
     form = RegistrationForm()
 
     if form.validate_on_submit():
+
         existing_user = User.query.filter_by(email=form.email.data).first()
         if existing_user:
             flash("Email already registered.", "danger")
             return redirect(url_for("main.register"))
 
-        hashed_pw = bcrypt.generate_password_hash(form.password.data).decode("utf-8")
+        hashed_pw = bcrypt.generate_password_hash(
+            form.password.data
+        ).decode("utf-8")
 
         new_user = User(
             username=form.username.data,
             email=form.email.data,
             password_hash=hashed_pw,
-            visit_count=0
+            visit_count=0,
+            created_at=datetime.now(IST)
         )
 
         db.session.add(new_user)
@@ -61,13 +70,16 @@ def login():
     form = LoginForm()
 
     if form.validate_on_submit():
+
         user = User.query.filter_by(email=form.email.data).first()
 
         if user and bcrypt.check_password_hash(user.password_hash, form.password.data):
+
             login_user(user)
 
+            # Update visit tracking
             user.visit_count = (user.visit_count or 0) + 1
-            user.last_login = datetime.now(pytz.timezone("Asia/Kolkata"))
+            user.last_login = datetime.now(IST)
             db.session.commit()
 
             return redirect(url_for("main.select_water"))
@@ -78,7 +90,7 @@ def login():
 
 
 # =========================
-# WATER SELECTION PAGE
+# WATER SELECTION
 # =========================
 @main.route("/select_water", methods=["GET", "POST"])
 @login_required
@@ -109,7 +121,10 @@ def dashboard():
     if water_type not in ["ocean", "pond"]:
         return redirect(url_for("main.select_water"))
 
-    return render_template("dashboard.html", water_type=water_type)
+    return render_template(
+        "dashboard.html",
+        water_type=water_type
+    )
 
 
 # =========================
@@ -138,6 +153,7 @@ def save_data():
 
     data = request.form
 
+    # Validation
     if not data.get("latitude") or not data.get("longitude"):
         flash("Location is required.", "danger")
         return redirect(url_for("main.dashboard"))
@@ -153,8 +169,14 @@ def save_data():
 
     if image and image.filename:
         filename = secure_filename(image.filename)
+
+        # Prevent overwrite
+        timestamp_str = datetime.now().strftime("%Y%m%d%H%M%S")
+        filename = f"{timestamp_str}_{filename}"
+
         save_path = os.path.join(UPLOAD_FOLDER, filename)
         image.save(save_path)
+
         image_path = f"uploads/{filename}"
 
     def to_float(value):
@@ -163,8 +185,7 @@ def save_data():
         except:
             return None
 
-    ist = pytz.timezone("Asia/Kolkata")
-    current_time = datetime.now(ist)
+    current_time = datetime.now(IST)
 
     entry = WaterData(
         user_id=current_user.id,
@@ -173,13 +194,17 @@ def save_data():
         water_type=water_type,
         pin_id=data.get("pin_id"),
 
+        # Ocean only
         chlorophyll=to_float(data.get("chlorophyll")) if water_type == "ocean" else None,
         ta=to_float(data.get("ta")) if water_type == "ocean" else None,
         dic=to_float(data.get("dic")) if water_type == "ocean" else None,
 
+        # Common
         temperature=to_float(data.get("temperature")),
         ph=to_float(data.get("ph")),
         tds=to_float(data.get("tds")),
+
+        # Pond only
         do=to_float(data.get("do")) if water_type == "pond" else None,
 
         image_path=image_path,
