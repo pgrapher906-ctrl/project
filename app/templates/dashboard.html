@@ -5,6 +5,27 @@
 {% block head %}
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
 <style>
+
+/* Main Glass Card */
+.glass-card {
+    max-width: 1000px;
+    margin: 40px auto;
+    padding: 40px;
+    border-radius: 25px;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(15px);
+    box-shadow: 0 25px 60px rgba(0,0,0,0.25);
+}
+
+/* Section Titles */
+.section-title {
+    font-weight: 600;
+    margin-top: 25px;
+    margin-bottom: 12px;
+    color: #0A3D62;
+}
+
+/* Map */
 #map {
     height: 300px;
     border-radius: 15px;
@@ -12,13 +33,7 @@
     display: none;
 }
 
-.section-title {
-    font-weight: 600;
-    margin-top: 25px;
-    margin-bottom: 10px;
-    color: #0A3D62;
-}
-
+/* Sensor Boxes */
 .sensor-box {
     background: #f4f9fc;
     border-radius: 12px;
@@ -27,6 +42,7 @@
     font-weight: 500;
 }
 
+/* Status Colors */
 .status-connected {
     color: green;
     font-weight: 600;
@@ -37,24 +53,26 @@
     font-weight: 600;
 }
 
+/* Buttons */
 .custom-btn {
     background: linear-gradient(90deg, #0A3D62, #1ABC9C);
     color: white;
     border: none;
-    padding: 8px 20px;
-    border-radius: 10px;
-    transition: 0.2s;
+    padding: 10px 22px;
+    border-radius: 12px;
+    transition: 0.3s ease;
 }
 
 .custom-btn:hover {
     opacity: 0.9;
 }
+
 </style>
 {% endblock %}
 
 {% block content %}
 
-<div class="card form-card">
+<div class="glass-card">
 
     <h3 class="fw-semibold mb-4">Water Quality Data Entry</h3>
 
@@ -62,7 +80,9 @@
 
         <!-- STEP 1 -->
         <div class="section-title">Step 1 – Detect Location</div>
-        <button type="button" class="custom-btn mb-3" onclick="getLocation()">Detect Location</button>
+        <button type="button" class="custom-btn mb-3" onclick="getLocation()">
+            Detect Location
+        </button>
 
         <div class="row g-3">
             <div class="col-md-6">
@@ -97,22 +117,30 @@
 
         <!-- STEP 4 -->
         <div class="section-title">Step 4 – Bluetooth</div>
-        <button type="button" class="custom-btn mb-2" onclick="scanBLE()">Scan BLE Devices</button>
-        <p>Status: <span id="bleStatus" class="status-disconnected">Not Connected</span></p>
+        <button type="button" class="custom-btn mb-2" onclick="scanBLE()">
+            Scan BLE Devices
+        </button>
+        <p>Status:
+            <span id="bleStatus" class="status-disconnected">
+                Not Connected
+            </span>
+        </p>
 
         <!-- STEP 5 -->
         <div class="section-title">Step 5 – Sensor Data</div>
-        <button type="button" class="custom-btn mb-3" onclick="readSensor()">Read Sensor Data</button>
+        <button type="button" class="custom-btn mb-3" onclick="readSensor()">
+            Read Sensor Data
+        </button>
 
         <div class="row g-3">
             <div class="col-md-4">
                 <input class="form-control sensor-box" name="temperature" placeholder="Temperature">
             </div>
             <div class="col-md-4">
-                <input class="form-control sensor-box" name="ph" placeholder="pH" readonly>
+                <input class="form-control sensor-box" name="ph" placeholder="pH">
             </div>
             <div class="col-md-4">
-                <input class="form-control sensor-box" name="tds" placeholder="TDS" readonly>
+                <input class="form-control sensor-box" name="tds" placeholder="TDS">
             </div>
             <div class="col-md-4">
                 <input class="form-control sensor-box" name="chlorophyll" placeholder="Chlorophyll">
@@ -129,7 +157,9 @@
         <div class="section-title">Step 6 – Upload Image</div>
         <input type="file" class="form-control mb-3" name="image">
 
-        <button type="submit" class="custom-btn">Save Data</button>
+        <button type="submit" class="custom-btn">
+            Save Data
+        </button>
 
     </form>
 
@@ -166,6 +196,7 @@ function showMap(lat, lon) {
 
     if (!map) {
         map = L.map('map').setView([lat, lon], 13);
+
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© OpenStreetMap contributors'
         }).addTo(map);
@@ -210,4 +241,5 @@ function readSensor() {
     alert("ESP32 backend integration required.");
 }
 </script>
+
 {% endblock %}
