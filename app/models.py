@@ -1,6 +1,7 @@
 from datetime import datetime
 from app import db
 from flask_login import UserMixin
+from sqlalchemy.sql import func
 
 
 # ==========================================
@@ -18,9 +19,12 @@ class User(db.Model, UserMixin):
 
     # ---- User Activity Tracking ----
     visit_count = db.Column(db.Integer, default=0)
-    last_login = db.Column(db.DateTime)
+    last_login = db.Column(db.DateTime(timezone=True))
 
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(
+        db.DateTime(timezone=True),
+        server_default=func.now()
+    )
 
     # ---- Relationship ----
     water_entries = db.relationship(
@@ -32,7 +36,6 @@ class User(db.Model, UserMixin):
 
     def __repr__(self):
         return f"<User {self.username}>"
-
 
 
 # ==========================================
@@ -49,10 +52,10 @@ class WaterData(db.Model):
         nullable=False
     )
 
-    # Server timestamp (auto captured)
+    # Auto timestamp (DB side, timezone safe)
     timestamp = db.Column(
-        db.DateTime,
-        default=datetime.utcnow,
+        db.DateTime(timezone=True),
+        server_default=func.now(),
         nullable=False
     )
 
@@ -79,7 +82,10 @@ class WaterData(db.Model):
     # COMMON PARAMETERS
     # =======================
     temperature = db.Column(db.Float)
-    ph = db.Column(db.Float)
+
+    # 🔥 UPDATED pH FIELD (Scientific precision)
+    ph = db.Column(db.Numeric(4, 2))  # Example: 7.25
+
     tds = db.Column(db.Float)
 
     # =======================
