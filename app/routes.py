@@ -14,8 +14,6 @@ from app.forms import LoginForm, RegistrationForm
 main = Blueprint("main", __name__)
 
 UPLOAD_FOLDER = "app/static/uploads"
-
-# Indian Timezone
 IST = pytz.timezone("Asia/Kolkata")
 
 
@@ -35,8 +33,8 @@ def register():
     form = RegistrationForm()
 
     if form.validate_on_submit():
-
         existing_user = User.query.filter_by(email=form.email.data).first()
+
         if existing_user:
             flash("Email already registered.", "danger")
             return redirect(url_for("main.register"))
@@ -70,14 +68,11 @@ def login():
     form = LoginForm()
 
     if form.validate_on_submit():
-
         user = User.query.filter_by(email=form.email.data).first()
 
         if user and bcrypt.check_password_hash(user.password_hash, form.password.data):
-
             login_user(user)
 
-            # Update visit tracking
             user.visit_count = (user.visit_count or 0) + 1
             user.last_login = datetime.now(IST)
             db.session.commit()
@@ -115,16 +110,12 @@ def select_water():
 @main.route("/dashboard")
 @login_required
 def dashboard():
-
     water_type = session.get("water_type")
 
     if water_type not in ["ocean", "pond"]:
         return redirect(url_for("main.select_water"))
 
-    return render_template(
-        "dashboard.html",
-        water_type=water_type
-    )
+    return render_template("dashboard.html", water_type=water_type)
 
 
 # =========================
@@ -153,7 +144,6 @@ def save_data():
 
     data = request.form
 
-    # Validation
     if not data.get("latitude") or not data.get("longitude"):
         flash("Location is required.", "danger")
         return redirect(url_for("main.dashboard"))
@@ -170,7 +160,6 @@ def save_data():
     if image and image.filename:
         filename = secure_filename(image.filename)
 
-        # Prevent overwrite
         timestamp_str = datetime.now().strftime("%Y%m%d%H%M%S")
         filename = f"{timestamp_str}_{filename}"
 
@@ -194,17 +183,14 @@ def save_data():
         water_type=water_type,
         pin_id=data.get("pin_id"),
 
-        # Ocean only
         chlorophyll=to_float(data.get("chlorophyll")) if water_type == "ocean" else None,
         ta=to_float(data.get("ta")) if water_type == "ocean" else None,
         dic=to_float(data.get("dic")) if water_type == "ocean" else None,
 
-        # Common
         temperature=to_float(data.get("temperature")),
         ph=to_float(data.get("ph")),
         tds=to_float(data.get("tds")),
 
-        # Pond only
         do=to_float(data.get("do")) if water_type == "pond" else None,
 
         image_path=image_path,
