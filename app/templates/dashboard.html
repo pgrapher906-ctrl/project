@@ -1,4 +1,5 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
+
 {% block title %}Dashboard | Smart Water Monitoring{% endblock %}
 
 {% block head %}
@@ -53,102 +54,85 @@
 
 {% block content %}
 
-<div class="glass-card">
+<div class="card form-card">
 
-<h3 class="fw-semibold mb-4">Water Quality Data Entry</h3>
+    <h3 class="fw-semibold mb-4">Water Quality Data Entry</h3>
 
-<form method="POST" action="/save_data" enctype="multipart/form-data">
+    <form method="POST" action="/save_data" enctype="multipart/form-data">
 
-<!-- STEP 1 -->
-<div class="section-title">Step 1 – Detect Location</div>
-<button type="button" class="custom-btn mb-3" onclick="getLocation()">Detect Location</button>
+        <!-- STEP 1 -->
+        <div class="section-title">Step 1 – Detect Location</div>
+        <button type="button" class="custom-btn mb-3" onclick="getLocation()">Detect Location</button>
 
-<div class="row g-3">
-    <div class="col-md-6">
-        <input type="text" id="latitude" name="latitude"
-               class="form-control" placeholder="Latitude"
-               onchange="updateMapFromInput()">
-    </div>
-    <div class="col-md-6">
-        <input type="text" id="longitude" name="longitude"
-               class="form-control" placeholder="Longitude"
-               onchange="updateMapFromInput()">
-    </div>
-</div>
+        <div class="row g-3">
+            <div class="col-md-6">
+                <input type="text" id="latitude" name="latitude"
+                       class="form-control"
+                       placeholder="Latitude"
+                       onchange="updateMapFromInput()">
+            </div>
+            <div class="col-md-6">
+                <input type="text" id="longitude" name="longitude"
+                       class="form-control"
+                       placeholder="Longitude"
+                       onchange="updateMapFromInput()">
+            </div>
+        </div>
 
-<div id="map"></div>
+        <div id="map"></div>
 
-<!-- STEP 2 -->
-<div class="section-title">Step 2 – Water Type</div>
-<select class="form-select mb-3" name="water_type" required>
-    {% if water_type == "ocean" %}
-        <option>Open Ocean Water</option>
-        <option>Coastal Water</option>
-        <option>Estuarine Water</option>
-        <option>Deep Sea Water</option>
-        <option>Marine Surface Water</option>
-    {% elif water_type == "pond" %}
-        <option>Pond Water</option>
-        <option>Drinking Water</option>
-        <option>Ground Water</option>
-    {% endif %}
-</select>
+        <!-- STEP 2 -->
+        <div class="section-title">Step 2 – Water Type</div>
+        <select class="form-select mb-3" name="water_type" required>
+            <option value="ocean">Open Ocean Water</option>
+            <option value="pond">Pond Water</option>
+        </select>
 
-<!-- STEP 3 -->
-<div class="section-title">Step 3 – Pin ID</div>
-<input type="text" class="form-control mb-3"
-       name="pin_id" placeholder="Enter Pin ID" required>
+        <!-- STEP 3 -->
+        <div class="section-title">Step 3 – Pin ID</div>
+        <input type="text" class="form-control mb-3"
+               name="pin_id"
+               placeholder="Enter Pin ID"
+               required>
 
-<!-- STEP 4 -->
-<div class="section-title">Step 4 – Bluetooth</div>
-<button type="button" class="btn btn-outline-primary mb-2"
-        onclick="scanBLE()">Scan BLE Devices</button>
-<p>Status:
-<span id="bleStatus" class="status-disconnected">Not Connected</span>
-</p>
+        <!-- STEP 4 -->
+        <div class="section-title">Step 4 – Bluetooth</div>
+        <button type="button" class="custom-btn mb-2" onclick="scanBLE()">Scan BLE Devices</button>
+        <p>Status: <span id="bleStatus" class="status-disconnected">Not Connected</span></p>
 
-<!-- STEP 5 -->
-<div class="section-title">Step 5 – Sensor Data</div>
-<button type="button" class="custom-btn mb-3"
-        onclick="readSensor()">Read Sensor Data</button>
+        <!-- STEP 5 -->
+        <div class="section-title">Step 5 – Sensor Data</div>
+        <button type="button" class="custom-btn mb-3" onclick="readSensor()">Read Sensor Data</button>
 
-<div class="row g-3">
-    <div class="col-md-4">
-        <input class="form-control sensor-box" name="temperature" placeholder="Temperature" readonly>
-    </div>
-    <div class="col-md-4">
-        <input class="form-control sensor-box" name="ph" placeholder="pH" readonly>
-    </div>
-    <div class="col-md-4">
-        <input class="form-control sensor-box" name="tds" placeholder="TDS" readonly>
-    </div>
+        <div class="row g-3">
+            <div class="col-md-4">
+                <input class="form-control sensor-box" name="temperature" placeholder="Temperature">
+            </div>
+            <div class="col-md-4">
+                <input class="form-control sensor-box" name="ph" placeholder="pH" readonly>
+            </div>
+            <div class="col-md-4">
+                <input class="form-control sensor-box" name="tds" placeholder="TDS" readonly>
+            </div>
+            <div class="col-md-4">
+                <input class="form-control sensor-box" name="chlorophyll" placeholder="Chlorophyll">
+            </div>
+            <div class="col-md-4">
+                <input class="form-control sensor-box" name="ta" placeholder="Total Alkalinity">
+            </div>
+            <div class="col-md-4">
+                <input class="form-control sensor-box" name="dic" placeholder="DIC">
+            </div>
+        </div>
 
-    {% if water_type == "ocean" %}
-    <div class="col-md-4">
-        <input class="form-control sensor-box" name="chlorophyll" placeholder="Chlorophyll" readonly>
-    </div>
-    <div class="col-md-4">
-        <input class="form-control sensor-box" name="ta" placeholder="Total Alkalinity" readonly>
-    </div>
-    <div class="col-md-4">
-        <input class="form-control sensor-box" name="dic" placeholder="DIC" readonly>
-    </div>
-    {% endif %}
+        <!-- STEP 6 -->
+        <div class="section-title">Step 6 – Upload Image</div>
+        <input type="file" class="form-control mb-3" name="image">
 
-    {% if water_type == "pond" %}
-    <div class="col-md-4">
-        <input class="form-control sensor-box" name="do" placeholder="Dissolved Oxygen" readonly>
-    </div>
-    {% endif %}
-</div>
+        <button type="submit" class="custom-btn">Save Data</button>
 
-<!-- STEP 6 -->
-<div class="section-title">Step 6 – Upload Image</div>
-<input type="file" class="form-control mb-3" name="image">
+    </form>
 
-<button type="submit" class="custom-btn">Save Data</button>
-
-</form>
 </div>
 
 {% endblock %}
@@ -182,9 +166,8 @@ function showMap(lat, lon) {
 
     if (!map) {
         map = L.map('map').setView([lat, lon], 13);
-
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap contributors'
+            attribution: '© OpenStreetMap contributors'
         }).addTo(map);
     } else {
         map.setView([lat, lon], 13);
@@ -212,10 +195,7 @@ async function scanBLE() {
     const status = document.getElementById("bleStatus");
 
     try {
-        const device = await navigator.bluetooth.requestDevice({
-            acceptAllDevices: true
-        });
-
+        await navigator.bluetooth.requestDevice({ acceptAllDevices: true });
         status.innerText = "Connected";
         status.classList.remove("status-disconnected");
         status.classList.add("status-connected");
