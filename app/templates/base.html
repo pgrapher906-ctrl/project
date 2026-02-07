@@ -10,67 +10,125 @@
 
     <style>
         body {
-            background-color: #f4f6f9;
+            background-color: #F4F6F9;
             font-family: 'Segoe UI', sans-serif;
         }
 
+        /* NAVBAR */
         .navbar {
-            background: linear-gradient(90deg, #0d3b66, #1d3557);
+            background: linear-gradient(90deg, #0A3D62, #1B4965);
+            padding: 12px 20px;
         }
 
         .navbar-brand {
             font-weight: 600;
+            font-size: 18px;
             color: white !important;
+            display: flex;
+            align-items: center;
         }
 
+        .navbar-brand img {
+            height: 30px;
+            margin-right: 10px;
+        }
+
+        /* CARD */
         .dashboard-card {
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            border-radius: 14px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
             padding: 30px;
             background: white;
         }
 
+        /* SECTION TITLES */
         .section-title {
             font-weight: 600;
             margin-top: 25px;
             margin-bottom: 10px;
-            color: #1d3557;
+            color: #0A3D62;
         }
 
+        /* BUTTONS */
         .btn-primary {
-            background-color: #1d3557;
+            background-color: #0A3D62;
             border: none;
         }
 
         .btn-primary:hover {
-            background-color: #0d3b66;
+            background-color: #08314F;
         }
 
+        .btn-success {
+            background-color: #1ABC9C;
+            border: none;
+        }
+
+        .btn-success:hover {
+            background-color: #17A589;
+        }
+
+        /* MAP */
         #map {
             height: 300px;
             border-radius: 12px;
         }
 
+        /* READ ONLY */
         .readonly {
-            background-color: #f1f3f5;
+            background-color: #E9ECEF;
         }
+
+        /* USER INFO */
+        .user-info {
+            font-size: 14px;
+        }
+
+        .user-info span {
+            margin-right: 15px;
+        }
+
     </style>
 
     {% block head %}{% endblock %}
 </head>
+
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-dark px-4">
+<nav class="navbar navbar-expand-lg navbar-dark">
     <div class="container-fluid">
-        <span class="navbar-brand">Smart Water Monitoring System</span>
 
-        <div class="d-flex align-items-center gap-3 text-white">
-            <span>{{ current_user.username }}</span>
+        <!-- LOGO + TITLE -->
+        <a class="navbar-brand" href="#">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
+            Smart Water Monitoring System
+        </a>
 
-            <a href="{{ url_for('main.logout') }}" class="btn btn-sm btn-light">
+        {% if current_user.is_authenticated %}
+        <div class="d-flex align-items-center text-white user-info">
+
+            <span>
+                👤 {{ current_user.username }}
+            </span>
+
+            <span>
+                Visits: {{ current_user.visit_count }}
+            </span>
+
+            {% if current_user.last_login %}
+            <span>
+                Last Login:
+                {{ current_user.last_login.strftime("%d-%m-%Y %H:%M") }}
+            </span>
+            {% endif %}
+
+            <a href="{{ url_for('main.logout') }}" class="btn btn-sm btn-light ms-3">
                 Logout
             </a>
+
         </div>
+        {% endif %}
+
     </div>
 </nav>
 
