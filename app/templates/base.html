@@ -12,80 +12,76 @@
         body {
             background-color: #F4F6F9;
             font-family: 'Segoe UI', sans-serif;
+            margin: 0;
         }
 
         /* NAVBAR */
         .navbar {
-            background: linear-gradient(90deg, #0A3D62, #1B4965);
-            padding: 12px 20px;
+            background: #0A3D62;
+            padding: 10px 20px;
         }
 
         .navbar-brand {
             font-weight: 600;
-            font-size: 18px;
+            font-size: 17px;
             color: white !important;
             display: flex;
             align-items: center;
+            cursor: pointer;
         }
 
         .navbar-brand img {
-            height: 30px;
-            margin-right: 10px;
+            height: 28px;
+            margin-right: 8px;
         }
 
-        /* CARD */
+        /* USER SECTION */
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: white;
+            font-size: 14px;
+        }
+
+        .logout-btn {
+            background: #1ABC9C;
+            border: none;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .logout-btn:hover {
+            background: #17A589;
+        }
+
+        /* POPUP */
+        .info-popup {
+            position: absolute;
+            top: 55px;
+            right: 20px;
+            background: white;
+            color: #0A3D62;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            display: none;
+            min-width: 220px;
+            font-size: 14px;
+            z-index: 999;
+        }
+
+        .info-popup.show {
+            display: block;
+        }
+
         .dashboard-card {
             border-radius: 14px;
             box-shadow: 0 8px 25px rgba(0,0,0,0.08);
             padding: 30px;
             background: white;
-        }
-
-        /* SECTION TITLES */
-        .section-title {
-            font-weight: 600;
-            margin-top: 25px;
-            margin-bottom: 10px;
-            color: #0A3D62;
-        }
-
-        /* BUTTONS */
-        .btn-primary {
-            background-color: #0A3D62;
-            border: none;
-        }
-
-        .btn-primary:hover {
-            background-color: #08314F;
-        }
-
-        .btn-success {
-            background-color: #1ABC9C;
-            border: none;
-        }
-
-        .btn-success:hover {
-            background-color: #17A589;
-        }
-
-        /* MAP */
-        #map {
-            height: 300px;
-            border-radius: 12px;
-        }
-
-        /* READ ONLY */
-        .readonly {
-            background-color: #E9ECEF;
-        }
-
-        /* USER INFO */
-        .user-info {
-            font-size: 14px;
-        }
-
-        .user-info span {
-            margin-right: 15px;
         }
 
     </style>
@@ -95,46 +91,54 @@
 
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-dark">
-    <div class="container-fluid">
+<nav class="navbar navbar-dark">
+    <div class="container-fluid d-flex justify-content-between">
 
-        <!-- LOGO + TITLE -->
-        <a class="navbar-brand" href="#">
-            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
-            Smart Water Monitoring System
-        </a>
+        <!-- LOGO (CLICK TO SHOW INFO) -->
+        <div class="navbar-brand" onclick="toggleUserInfo()">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo">
+            Smart Water Monitoring
+        </div>
 
         {% if current_user.is_authenticated %}
-        <div class="d-flex align-items-center text-white user-info">
+        <div class="nav-right">
+            👤 {{ current_user.username }}
 
-            <span>
-                👤 {{ current_user.username }}
-            </span>
-
-            <span>
-                Visits: {{ current_user.visit_count }}
-            </span>
-
-            {% if current_user.last_login %}
-            <span>
-                Last Login:
-                {{ current_user.last_login.strftime("%d-%m-%Y %H:%M") }}
-            </span>
-            {% endif %}
-
-            <a href="{{ url_for('main.logout') }}" class="btn btn-sm btn-light ms-3">
+            <a href="{{ url_for('main.logout') }}" class="logout-btn">
                 Logout
             </a>
-
         </div>
         {% endif %}
 
     </div>
 </nav>
 
+<!-- USER INFO POPUP -->
+{% if current_user.is_authenticated %}
+<div id="userInfoPopup" class="info-popup">
+    <div><strong>User:</strong> {{ current_user.username }}</div>
+    <div><strong>Visits:</strong> {{ current_user.visit_count }}</div>
+    {% if current_user.last_login %}
+    <div>
+        <strong>Last Login:</strong><br>
+        {{ current_user.last_login.strftime("%d-%m-%Y %H:%M") }}
+    </div>
+    {% endif %}
+</div>
+{% endif %}
+
 <div class="container mt-5 mb-5">
     {% block content %}{% endblock %}
 </div>
+
+<script>
+function toggleUserInfo() {
+    const popup = document.getElementById("userInfoPopup");
+    if (popup) {
+        popup.classList.toggle("show");
+    }
+}
+</script>
 
 {% block scripts %}{% endblock %}
 </body>
