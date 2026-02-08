@@ -44,7 +44,7 @@
     max-width: 1000px;
     padding: 45px;
     border-radius: 25px;
-    background: rgba(255, 255, 255, 0.90);
+    background: rgba(255, 255, 255, 0.92);
     backdrop-filter: blur(15px);
     box-shadow: 0 25px 60px rgba(0,0,0,0.25);
     z-index: 10;
@@ -73,7 +73,6 @@
     box-shadow: 0 30px 60px rgba(0,0,0,0.25);
 }
 
-/* image preview */
 .water-preview {
     height: 220px;
     border-radius: 18px;
@@ -142,11 +141,9 @@
                         🌊 Ocean Monitoring
                     </h4>
 
-                    <form method="POST">
-                        <button type="submit"
-                                name="water_type"
-                                value="ocean"
-                                class="btn btn-ocean w-100">
+                    <form method="POST" action="{{ url_for('main.select_water') }}">
+                        <input type="hidden" name="water_type" value="ocean">
+                        <button type="submit" class="btn btn-ocean w-100">
                             Enter Ocean Monitoring
                         </button>
                     </form>
@@ -166,11 +163,9 @@
                         🏞 Pond & Inland Monitoring
                     </h4>
 
-                    <form method="POST">
-                        <button type="submit"
-                                name="water_type"
-                                value="pond"
-                                class="btn btn-pond w-100">
+                    <form method="POST" action="{{ url_for('main.select_water') }}">
+                        <input type="hidden" name="water_type" value="pond">
+                        <button type="submit" class="btn btn-pond w-100">
                             Enter Pond Monitoring
                         </button>
                     </form>
