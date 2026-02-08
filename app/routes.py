@@ -17,25 +17,24 @@ UPLOAD_FOLDER = "app/static/uploads"
 IST = pytz.timezone("Asia/Kolkata")
 
 
-# =========================
+# =====================================================
 # HOME
-# =========================
+# =====================================================
 @main.route("/")
 def home():
     return redirect(url_for("main.login"))
 
 
-# =========================
+# =====================================================
 # REGISTER
-# =========================
+# =====================================================
 @main.route("/register", methods=["GET", "POST"])
 def register():
     form = RegistrationForm()
 
     if form.validate_on_submit():
-        existing_user = User.query.filter_by(email=form.email.data).first()
 
-        if existing_user:
+        if User.query.filter_by(email=form.email.data).first():
             flash("Email already registered.", "danger")
             return redirect(url_for("main.register"))
 
@@ -47,8 +46,7 @@ def register():
             username=form.username.data,
             email=form.email.data,
             password_hash=hashed_pw,
-            visit_count=0,
-            created_at=datetime.now(IST)
+            visit_count=0
         )
 
         db.session.add(new_user)
@@ -60,9 +58,9 @@ def register():
     return render_template("register.html", form=form)
 
 
-# =========================
+# =====================================================
 # LOGIN
-# =========================
+# =====================================================
 @main.route("/login", methods=["GET", "POST"])
 def login():
     form = LoginForm()
@@ -71,6 +69,7 @@ def login():
         user = User.query.filter_by(email=form.email.data).first()
 
         if user and bcrypt.check_password_hash(user.password_hash, form.password.data):
+
             login_user(user)
 
             user.visit_count = (user.visit_count or 0) + 1
@@ -84,66 +83,70 @@ def login():
     return render_template("login.html", form=form)
 
 
-# =========================
-# WATER SELECTION
-# =========================
+# =====================================================
+# SELECT WATER CATEGORY (Ocean / Pond)
+# =====================================================
 @main.route("/select_water", methods=["GET", "POST"])
 @login_required
 def select_water():
 
     if request.method == "POST":
-        selected = request.form.get("water_type")
+        category = request.form.get("water_category")
 
-        if selected not in ["ocean", "pond"]:
+        if category not in ["ocean", "pond"]:
             flash("Please select valid water category.", "danger")
             return redirect(url_for("main.select_water"))
 
-        session["water_type"] = selected
+        session["water_category"] = category
         return redirect(url_for("main.dashboard"))
 
     return render_template("select_water.html")
 
 
-# =========================
+# =====================================================
 # DASHBOARD
-# =========================
+# =====================================================
 @main.route("/dashboard")
 @login_required
 def dashboard():
-    water_type = session.get("water_type")
 
-    if water_type not in ["ocean", "pond"]:
+    category = session.get("water_category")
+
+    if category not in ["ocean", "pond"]:
         return redirect(url_for("main.select_water"))
 
-    return render_template("dashboard.html", water_type=water_type)
+    return render_template("dashboard.html", category=category)
 
 
-# =========================
+# =====================================================
 # LOGOUT
-# =========================
+# =====================================================
 @main.route("/logout")
 @login_required
 def logout():
-    session.pop("water_type", None)
+    session.clear()
     logout_user()
     return redirect(url_for("main.login"))
 
 
-# =========================
+# =====================================================
 # SAVE DATA
-# =========================
+# =====================================================
 @main.route("/save_data", methods=["POST"])
 @login_required
 def save_data():
 
-    water_type = session.get("water_type")
+    category = session.get("water_category")
 
-    if water_type not in ["ocean", "pond"]:
-        flash("Water type not selected.", "danger")
+    if category not in ["ocean", "pond"]:
+        flash("Water category not selected.", "danger")
         return redirect(url_for("main.select_water"))
 
     data = request.form
 
+    # --------------------------
+    # Basic Validation
+    # --------------------------
     if not data.get("latitude") or not data.get("longitude"):
         flash("Location is required.", "danger")
         return redirect(url_for("main.dashboard"))
@@ -152,6 +155,13 @@ def save_data():
         flash("Pin ID is required.", "danger")
         return redirect(url_for("main.dashboard"))
 
+    if not data.get("water_type"):
+        flash("Please select water type.", "danger")
+        return redirect(url_for("main.dashboard"))
+
+    # --------------------------
+    # Image Upload
+    # --------------------------
     os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
     image = request.files.get("image")
@@ -159,7 +169,6 @@ def save_data():
 
     if image and image.filename:
         filename = secure_filename(image.filename)
-
         timestamp_str = datetime.now().strftime("%Y%m%d%H%M%S")
         filename = f"{timestamp_str}_{filename}"
 
@@ -168,6 +177,9 @@ def save_data():
 
         image_path = f"uploads/{filename}"
 
+    # --------------------------
+    # Convert Helper
+    # --------------------------
     def to_float(value):
         try:
             return float(value) if value else None
@@ -176,22 +188,29 @@ def save_data():
 
     current_time = datetime.now(IST)
 
+    # --------------------------
+    # Create Entry
+    # --------------------------
     entry = WaterData(
         user_id=current_user.id,
         latitude=to_float(data.get("latitude")),
         longitude=to_float(data.get("longitude")),
-        water_type=water_type,
+
+        water_type=data.get("water_type"),   # ← detailed type saved
         pin_id=data.get("pin_id"),
 
-        chlorophyll=to_float(data.get("chlorophyll")) if water_type == "ocean" else None,
-        ta=to_float(data.get("ta")) if water_type == "ocean" else None,
-        dic=to_float(data.get("dic")) if water_type == "ocean" else None,
+        # Ocean parameters
+        chlorophyll=to_float(data.get("chlorophyll")) if category == "ocean" else None,
+        ta=to_float(data.get("ta")) if category == "ocean" else None,
+        dic=to_float(data.get("dic")) if category == "ocean" else None,
 
+        # Common
         temperature=to_float(data.get("temperature")),
         ph=to_float(data.get("ph")),
         tds=to_float(data.get("tds")),
 
-        do=to_float(data.get("do")) if water_type == "pond" else None,
+        # Pond parameter
+        do=to_float(data.get("do")) if category == "pond" else None,
 
         image_path=image_path,
         timestamp=current_time
