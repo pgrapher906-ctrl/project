@@ -34,7 +34,6 @@ def register():
 
     if form.validate_on_submit():
 
-        # Prevent duplicate email
         if User.query.filter_by(email=form.email.data).first():
             flash("Email already registered.", "danger")
             return redirect(url_for("main.register"))
@@ -87,7 +86,7 @@ def login():
 
 
 # =====================================================
-# SELECT WATER CATEGORY (Ocean / Pond)
+# SELECT WATER (Ocean / Pond)
 # =====================================================
 @main.route("/select_water", methods=["GET", "POST"])
 @login_required
@@ -97,10 +96,10 @@ def select_water():
         selected = request.form.get("water_type")
 
         if selected not in ["ocean", "pond"]:
-            flash("Please select a valid category.", "danger")
+            flash("Please select valid water category.", "danger")
             return redirect(url_for("main.select_water"))
 
-        # Save category in session
+        # Save selection in session
         session["water_category"] = selected
 
         return redirect(url_for("main.dashboard"))
@@ -118,8 +117,10 @@ def dashboard():
     category = session.get("water_category")
 
     if category not in ["ocean", "pond"]:
+        flash("Please select valid water category.", "danger")
         return redirect(url_for("main.select_water"))
 
+    # Pass category to template
     return render_template(
         "dashboard.html",
         category=category
@@ -147,13 +148,13 @@ def save_data():
     category = session.get("water_category")
 
     if category not in ["ocean", "pond"]:
-        flash("Water category not selected.", "danger")
+        flash("Please select valid water category.", "danger")
         return redirect(url_for("main.select_water"))
 
     data = request.form
 
     # --------------------------
-    # Basic Validation
+    # Validation
     # --------------------------
     if not data.get("latitude") or not data.get("longitude"):
         flash("Location is required.", "danger")
@@ -177,7 +178,6 @@ def save_data():
 
     if image and image.filename:
         filename = secure_filename(image.filename)
-
         timestamp_str = datetime.now().strftime("%Y%m%d%H%M%S")
         filename = f"{timestamp_str}_{filename}"
 
@@ -198,7 +198,7 @@ def save_data():
     current_time = datetime.now(IST)
 
     # --------------------------
-    # Create DB Entry
+    # Create Entry
     # --------------------------
     entry = WaterData(
         user_id=current_user.id,
@@ -206,21 +206,17 @@ def save_data():
         latitude=to_float(data.get("latitude")),
         longitude=to_float(data.get("longitude")),
 
-        # Detailed water type from dropdown
         water_type=data.get("water_type"),
         pin_id=data.get("pin_id"),
 
-        # Ocean parameters
         chlorophyll=to_float(data.get("chlorophyll")) if category == "ocean" else None,
         ta=to_float(data.get("ta")) if category == "ocean" else None,
         dic=to_float(data.get("dic")) if category == "ocean" else None,
 
-        # Common
         temperature=to_float(data.get("temperature")),
         ph=to_float(data.get("ph")),
         tds=to_float(data.get("tds")),
 
-        # Pond
         do=to_float(data.get("do")) if category == "pond" else None,
 
         image_path=image_path,
