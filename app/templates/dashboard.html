@@ -5,60 +5,62 @@
 {% block head %}
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
 <style>
-.glass-card {
-    max-width: 1000px;
-    margin: 40px auto;
-    padding: 40px;
-    border-radius: 25px;
-    background: rgba(255,255,255,0.92);
-    backdrop-filter: blur(15px);
-    box-shadow: 0 25px 60px rgba(0,0,0,0.25);
+
+body{
+    background:#F4F6F9;
 }
 
-.section-title {
-    font-weight: 600;
-    margin-top: 25px;
-    margin-bottom: 12px;
-    color: #0A3D62;
+.glass-card{
+    max-width:1000px;
+    margin:40px auto;
+    padding:40px;
+    border-radius:20px;
+    background:white;
+    box-shadow:0 15px 40px rgba(0,0,0,0.1);
 }
 
-.sensor-box {
-    background: #f4f9fc;
-    border-radius: 12px;
-    border: none;
-    padding: 12px;
-    font-weight: 500;
+.section-title{
+    font-weight:600;
+    margin-top:25px;
+    margin-bottom:12px;
+    color:#0A3D62;
 }
 
-#map {
-    height: 300px;
-    border-radius: 15px;
-    margin-top: 15px;
-    display: none;
+.sensor-box{
+    border-radius:12px;
+    padding:12px;
 }
 
-.custom-btn {
-    background: linear-gradient(90deg,#0A3D62,#1ABC9C);
-    color: white;
-    border: none;
-    padding: 10px 22px;
-    border-radius: 12px;
-    transition: 0.3s ease;
+.custom-btn{
+    background:#1ABC9C;
+    color:white;
+    border:none;
+    padding:10px 22px;
+    border-radius:12px;
+    transition:0.3s;
 }
 
-.custom-btn:hover {
-    opacity: 0.9;
+.custom-btn:hover{
+    background:#16A085;
 }
 
-.status-connected {
-    color: green;
-    font-weight: 600;
+#map{
+    height:300px;
+    border-radius:15px;
+    display:none;
+    margin-top:15px;
 }
 
-.status-disconnected {
-    color: red;
-    font-weight: 600;
+.status-connected{
+    color:green;
+    font-weight:600;
 }
+
+.status-disconnected{
+    color:red;
+    font-weight:600;
+}
+
 </style>
 {% endblock %}
 
@@ -68,47 +70,57 @@
 
 <h3 class="fw-semibold mb-4">Water Quality Data Entry</h3>
 
-<form method="POST" action="/save_data" enctype="multipart/form-data">
+<form method="POST" action="{{ url_for('main.save_data') }}" enctype="multipart/form-data">
 
 <!-- STEP 1 -->
-<div class="section-title">Step 1 - Detect Location</div>
+<div class="section-title">Step 1 – Detect Location</div>
 <button type="button" class="custom-btn mb-3" onclick="getLocation()">Detect Location</button>
 
 <div class="row g-3">
     <div class="col-md-6">
-        <input type="text" id="latitude" name="latitude" class="form-control" placeholder="Latitude">
+        <input type="text" id="latitude" name="latitude" class="form-control" placeholder="Latitude" required>
     </div>
     <div class="col-md-6">
-        <input type="text" id="longitude" name="longitude" class="form-control" placeholder="Longitude">
+        <input type="text" id="longitude" name="longitude" class="form-control" placeholder="Longitude" required>
     </div>
 </div>
 
 <div id="map"></div>
 
 <!-- STEP 2 -->
-<div class="section-title">Step 2 - Water Category</div>
+<div class="section-title">Step 2 – Water Category</div>
 
-<select class="form-select mb-3" id="mainWaterType" onchange="updateWaterTypes()" required>
+<select class="form-select mb-3"
+        id="mainWaterType"
+        onchange="updateWaterTypes()"
+        required>
     <option value="">Select Category</option>
     <option value="ocean">Ocean / Marine</option>
     <option value="pond">Pond / Freshwater</option>
 </select>
 
-<select class="form-select mb-3" id="waterType" name="water_type" onchange="toggleSensors()" required>
+<select class="form-select mb-3"
+        id="waterType"
+        name="water_type"
+        onchange="toggleSensors()"
+        required>
     <option value="">Select Water Type</option>
 </select>
 
 <!-- STEP 3 -->
-<div class="section-title">Step 3 - Pin ID</div>
+<div class="section-title">Step 3 – Pin ID</div>
 <input type="text" class="form-control mb-3" name="pin_id" placeholder="Enter Pin ID" required>
 
 <!-- STEP 4 -->
-<div class="section-title">Step 4 - Bluetooth</div>
+<div class="section-title">Step 4 – Bluetooth</div>
 <button type="button" class="custom-btn mb-2" onclick="scanBLE()">Scan BLE Devices</button>
-<p>Status: <span id="bleStatus" class="status-disconnected">Not Connected</span></p>
+<p>Status:
+<span id="bleStatus" class="status-disconnected">Not Connected</span>
+</p>
 
 <!-- STEP 5 -->
-<div class="section-title">Step 5 - Sensor Data</div>
+<div class="section-title">Step 5 – Sensor Data</div>
+<button type="button" class="custom-btn mb-3" onclick="readSensor()">Read Sensor Data</button>
 
 <div class="row g-3">
     <div class="col-md-4">
@@ -123,7 +135,7 @@
 </div>
 
 <!-- OCEAN SENSORS -->
-<div id="oceanSensors" class="row g-3 mt-2" style="display:none;">
+<div id="oceanSensors" class="row g-3 mt-3" style="display:none;">
     <div class="col-md-4">
         <input class="form-control sensor-box" name="chlorophyll" placeholder="Chlorophyll">
     </div>
@@ -136,14 +148,14 @@
 </div>
 
 <!-- POND SENSORS -->
-<div id="pondSensors" class="row g-3 mt-2" style="display:none;">
+<div id="pondSensors" class="row g-3 mt-3" style="display:none;">
     <div class="col-md-4">
         <input class="form-control sensor-box" name="do" placeholder="Dissolved Oxygen">
     </div>
 </div>
 
 <!-- STEP 6 -->
-<div class="section-title">Step 6 - Upload Image</div>
+<div class="section-title">Step 6 – Upload Image</div>
 <input type="file" class="form-control mb-3" name="image">
 
 <button type="submit" class="custom-btn">Save Data</button>
@@ -155,106 +167,118 @@
 
 {% block scripts %}
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
 <script>
 
-let map = null;
-let marker = null;
+let map=null;
+let marker=null;
 
-function updateWaterTypes() {
-    const mainType = document.getElementById("mainWaterType").value;
-    const waterTypeDropdown = document.getElementById("waterType");
+function getLocation(){
+    if(!navigator.geolocation){return;}
 
-    waterTypeDropdown.innerHTML = "<option value=''>Select Water Type</option>";
+    navigator.geolocation.getCurrentPosition(function(pos){
+        const lat=pos.coords.latitude;
+        const lon=pos.coords.longitude;
 
-    let options = [];
+        document.getElementById("latitude").value=lat;
+        document.getElementById("longitude").value=lon;
 
-    if (mainType === "ocean") {
-        options = [
+        showMap(lat,lon);
+    });
+}
+
+function showMap(lat,lon){
+    document.getElementById("map").style.display="block";
+
+    if(!map){
+        map=L.map('map').setView([lat,lon],13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+    }else{
+        map.setView([lat,lon],13);
+    }
+
+    if(marker){
+        marker.setLatLng([lat,lon]);
+    }else{
+        marker=L.marker([lat,lon]).addTo(map);
+    }
+
+    map.invalidateSize();
+}
+
+function updateWaterTypes(){
+    const main=document.getElementById("mainWaterType").value;
+    const dropdown=document.getElementById("waterType");
+
+    dropdown.innerHTML='<option value="">Select Water Type</option>';
+
+    let options=[];
+
+    if(main==="ocean"){
+        options=[
             "Open Ocean Water",
             "Coastal Water",
             "Estuarine Water",
             "Deep Sea Water",
             "Marine Surface Water"
         ];
-    } else if (mainType === "pond") {
-        options = [
+    }
+    else if(main==="pond"){
+        options=[
             "Pond Water",
-            "Lake Water",
             "Drinking Water",
-            "Ground Water",
-            "River Water"
+            "Ground Water"
         ];
     }
 
-    options.forEach(type => {
-        let option = document.createElement("option");
-        option.value = type;
-        option.textContent = type;
-        waterTypeDropdown.appendChild(option);
+    options.forEach(type=>{
+        const option=document.createElement("option");
+        option.value=type;
+        option.textContent=type;
+        dropdown.appendChild(option);
     });
 
     toggleSensors();
 }
 
-function toggleSensors() {
-    const mainType = document.getElementById("mainWaterType").value;
+function toggleSensors(){
+    const main=document.getElementById("mainWaterType").value;
 
-    if (mainType === "ocean") {
-        document.getElementById("oceanSensors").style.display = "flex";
-        document.getElementById("pondSensors").style.display = "none";
-    } else if (mainType === "pond") {
-        document.getElementById("oceanSensors").style.display = "none";
-        document.getElementById("pondSensors").style.display = "flex";
-    } else {
-        document.getElementById("oceanSensors").style.display = "none";
-        document.getElementById("pondSensors").style.display = "none";
+    if(main==="ocean"){
+        document.getElementById("oceanSensors").style.display="flex";
+        document.getElementById("pondSensors").style.display="none";
+    }
+    else if(main==="pond"){
+        document.getElementById("oceanSensors").style.display="none";
+        document.getElementById("pondSensors").style.display="flex";
+    }
+    else{
+        document.getElementById("oceanSensors").style.display="none";
+        document.getElementById("pondSensors").style.display="none";
     }
 }
 
-function getLocation() {
-    if (!navigator.geolocation) return;
+async function scanBLE(){
+    const status=document.getElementById("bleStatus");
 
-    navigator.geolocation.getCurrentPosition(function(position) {
-        const lat = position.coords.latitude;
-        const lon = position.coords.longitude;
-
-        document.getElementById("latitude").value = lat;
-        document.getElementById("longitude").value = lon;
-
-        showMap(lat, lon);
-    });
-}
-
-function showMap(lat, lon) {
-    document.getElementById("map").style.display = "block";
-
-    if (!map) {
-        map = L.map('map').setView([lat, lon], 13);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors'
-        }).addTo(map);
-    } else {
-        map.setView([lat, lon], 13);
+    try{
+        await navigator.bluetooth.requestDevice({acceptAllDevices:true});
+        status.innerText="Connected";
+        status.className="status-connected";
     }
-
-    if (marker) marker.setLatLng([lat, lon]);
-    else marker = L.marker([lat, lon]).addTo(map);
-
-    map.invalidateSize();
-}
-
-async function scanBLE() {
-    const status = document.getElementById("bleStatus");
-
-    try {
-        await navigator.bluetooth.requestDevice({ acceptAllDevices: true });
-        status.innerText = "Connected";
-        status.className = "status-connected";
-    } catch {
-        status.innerText = "Not Connected";
-        status.className = "status-disconnected";
+    catch{
+        status.innerText="Not Connected";
+        status.className="status-disconnected";
     }
 }
+
+function readSensor(){
+    alert("ESP32 integration required.");
+}
+
+window.onload=function(){
+    updateWaterTypes();
+};
 
 </script>
 {% endblock %}
