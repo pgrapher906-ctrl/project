@@ -34,6 +34,7 @@ def register():
 
     if form.validate_on_submit():
 
+        # Prevent duplicate email
         if User.query.filter_by(email=form.email.data).first():
             flash("Email already registered.", "danger")
             return redirect(url_for("main.register"))
@@ -46,13 +47,14 @@ def register():
             username=form.username.data,
             email=form.email.data,
             password_hash=hashed_pw,
-            visit_count=0
+            visit_count=0,
+            created_at=datetime.now(IST)
         )
 
         db.session.add(new_user)
         db.session.commit()
 
-        flash("Account created successfully! Please login.", "success")
+        flash("Account created successfully. Please login.", "success")
         return redirect(url_for("main.login"))
 
     return render_template("register.html", form=form)
@@ -66,6 +68,7 @@ def login():
     form = LoginForm()
 
     if form.validate_on_submit():
+
         user = User.query.filter_by(email=form.email.data).first()
 
         if user and bcrypt.check_password_hash(user.password_hash, form.password.data):
@@ -78,7 +81,7 @@ def login():
 
             return redirect(url_for("main.select_water"))
 
-        flash("Invalid email or password", "danger")
+        flash("Invalid email or password.", "danger")
 
     return render_template("login.html", form=form)
 
@@ -91,13 +94,15 @@ def login():
 def select_water():
 
     if request.method == "POST":
-        category = request.form.get("water_category")
+        selected = request.form.get("water_type")
 
-        if category not in ["ocean", "pond"]:
-            flash("Please select valid water category.", "danger")
+        if selected not in ["ocean", "pond"]:
+            flash("Please select a valid category.", "danger")
             return redirect(url_for("main.select_water"))
 
-        session["water_category"] = category
+        # Save category in session
+        session["water_category"] = selected
+
         return redirect(url_for("main.dashboard"))
 
     return render_template("select_water.html")
@@ -115,7 +120,10 @@ def dashboard():
     if category not in ["ocean", "pond"]:
         return redirect(url_for("main.select_water"))
 
-    return render_template("dashboard.html", category=category)
+    return render_template(
+        "dashboard.html",
+        category=category
+    )
 
 
 # =====================================================
@@ -124,7 +132,7 @@ def dashboard():
 @main.route("/logout")
 @login_required
 def logout():
-    session.clear()
+    session.pop("water_category", None)
     logout_user()
     return redirect(url_for("main.login"))
 
@@ -169,6 +177,7 @@ def save_data():
 
     if image and image.filename:
         filename = secure_filename(image.filename)
+
         timestamp_str = datetime.now().strftime("%Y%m%d%H%M%S")
         filename = f"{timestamp_str}_{filename}"
 
@@ -189,14 +198,16 @@ def save_data():
     current_time = datetime.now(IST)
 
     # --------------------------
-    # Create Entry
+    # Create DB Entry
     # --------------------------
     entry = WaterData(
         user_id=current_user.id,
+
         latitude=to_float(data.get("latitude")),
         longitude=to_float(data.get("longitude")),
 
-        water_type=data.get("water_type"),   # ← detailed type saved
+        # Detailed water type from dropdown
+        water_type=data.get("water_type"),
         pin_id=data.get("pin_id"),
 
         # Ocean parameters
@@ -209,7 +220,7 @@ def save_data():
         ph=to_float(data.get("ph")),
         tds=to_float(data.get("tds")),
 
-        # Pond parameter
+        # Pond
         do=to_float(data.get("do")) if category == "pond" else None,
 
         image_path=image_path,
