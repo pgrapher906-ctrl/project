@@ -18,11 +18,11 @@ IST = pytz.timezone("Asia/Kolkata")
 
 
 # =====================================================
-# HOME
+# SPLASH SCREEN (NEW)
 # =====================================================
 @main.route("/")
-def home():
-    return redirect(url_for("main.login"))
+def splash():
+    return render_template("splash.html")
 
 
 # =====================================================
@@ -86,7 +86,7 @@ def login():
 
 
 # =====================================================
-# SELECT WATER (Ocean / Pond)
+# SELECT WATER
 # =====================================================
 @main.route("/select_water", methods=["GET", "POST"])
 @login_required
@@ -99,9 +99,7 @@ def select_water():
             flash("Please select valid water category.", "danger")
             return redirect(url_for("main.select_water"))
 
-        # Save selection in session
         session["water_category"] = selected
-
         return redirect(url_for("main.dashboard"))
 
     return render_template("select_water.html")
@@ -117,14 +115,9 @@ def dashboard():
     category = session.get("water_category")
 
     if category not in ["ocean", "pond"]:
-        flash("Please select valid water category.", "danger")
         return redirect(url_for("main.select_water"))
 
-    # Pass category to template
-    return render_template(
-        "dashboard.html",
-        category=category
-    )
+    return render_template("dashboard.html", category=category)
 
 
 # =====================================================
@@ -139,7 +132,7 @@ def logout():
 
 
 # =====================================================
-# SAVE DATA
+# SAVE DATA (UNCHANGED LOGIC)
 # =====================================================
 @main.route("/save_data", methods=["POST"])
 @login_required
@@ -153,9 +146,6 @@ def save_data():
 
     data = request.form
 
-    # --------------------------
-    # Validation
-    # --------------------------
     if not data.get("latitude") or not data.get("longitude"):
         flash("Location is required.", "danger")
         return redirect(url_for("main.dashboard"))
@@ -168,9 +158,6 @@ def save_data():
         flash("Please select water type.", "danger")
         return redirect(url_for("main.dashboard"))
 
-    # --------------------------
-    # Image Upload
-    # --------------------------
     os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
     image = request.files.get("image")
@@ -186,9 +173,6 @@ def save_data():
 
         image_path = f"uploads/{filename}"
 
-    # --------------------------
-    # Convert Helper
-    # --------------------------
     def to_float(value):
         try:
             return float(value) if value else None
@@ -197,28 +181,19 @@ def save_data():
 
     current_time = datetime.now(IST)
 
-    # --------------------------
-    # Create Entry
-    # --------------------------
     entry = WaterData(
         user_id=current_user.id,
-
         latitude=to_float(data.get("latitude")),
         longitude=to_float(data.get("longitude")),
-
         water_type=data.get("water_type"),
         pin_id=data.get("pin_id"),
-
         chlorophyll=to_float(data.get("chlorophyll")) if category == "ocean" else None,
         ta=to_float(data.get("ta")) if category == "ocean" else None,
         dic=to_float(data.get("dic")) if category == "ocean" else None,
-
         temperature=to_float(data.get("temperature")),
         ph=to_float(data.get("ph")),
         tds=to_float(data.get("tds")),
-
         do=to_float(data.get("do")) if category == "pond" else None,
-
         image_path=image_path,
         timestamp=current_time
     )
