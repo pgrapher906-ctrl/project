@@ -3,24 +3,34 @@
 
 {% block head %}
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+
 <style>
+
+/* ==============================
+   CLEAN MOBILE SCIENTIFIC UI
+============================== */
+
 body {
     background: #F4F6F9;
 }
 
+.dashboard-wrapper {
+    max-width: 950px;
+    margin: 30px auto;
+    padding: 20px;
+}
+
 .glass-card {
-    max-width: 1000px;
-    margin: 40px auto;
-    padding: 40px;
-    border-radius: 20px;
     background: white;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+    padding: 25px;
+    border-radius: 18px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.08);
 }
 
 .section-title {
     font-weight: 600;
-    margin-top: 25px;
-    margin-bottom: 10px;
+    margin-top: 30px;
+    margin-bottom: 12px;
     color: #0A3D62;
 }
 
@@ -28,9 +38,10 @@ body {
     background: #1ABC9C;
     color: white;
     border: none;
-    padding: 10px 22px;
+    padding: 10px 18px;
     border-radius: 10px;
     transition: 0.3s;
+    font-weight: 500;
 }
 
 .custom-btn:hover {
@@ -38,34 +49,50 @@ body {
 }
 
 #map {
-    height: 300px;
+    height: 280px;
     border-radius: 12px;
     margin-top: 15px;
     display: none;
 }
 
 .status-connected {
-    color: green;
+    color: #16A085;
     font-weight: 600;
 }
 
 .status-disconnected {
-    color: red;
+    color: #E74C3C;
     font-weight: 600;
 }
+
+.sensor-box {
+    background: #F8FBFD;
+    padding: 15px;
+    border-radius: 12px;
+    border: 1px solid #e4eef5;
+}
+
+@media (max-width: 768px) {
+    .dashboard-wrapper {
+        padding: 10px;
+    }
+}
+
 </style>
 {% endblock %}
 
 {% block content %}
 
+<div class="dashboard-wrapper">
 <div class="glass-card">
 
-<h3 class="mb-4">Water Quality Data Entry</h3>
+<h4 class="mb-4 fw-semibold">Water Quality Data Entry</h4>
 
 <form method="POST" action="{{ url_for('main.save_data') }}" enctype="multipart/form-data">
 
-<!-- STEP 1 -->
+<!-- ================= STEP 1 ================= -->
 <div class="section-title">Step 1 – Detect Location</div>
+
 <button type="button" class="custom-btn mb-3" onclick="getLocation()">Detect Location</button>
 
 <div class="row g-3">
@@ -79,70 +106,80 @@ body {
 
 <div id="map"></div>
 
-
-<!-- STEP 2 -->
+<!-- ================= STEP 2 ================= -->
 <div class="section-title">Step 2 – Water Type</div>
 
 <select class="form-select mb-3" id="waterType" name="water_type" required>
     <option value="">Select Water Type</option>
 </select>
 
-
-<!-- STEP 3 -->
+<!-- ================= STEP 3 ================= -->
 <div class="section-title">Step 3 – Pin ID</div>
 <input type="text" name="pin_id" class="form-control mb-3" placeholder="Enter Pin ID" required>
 
-
-<!-- STEP 4 -->
+<!-- ================= STEP 4 ================= -->
 <div class="section-title">Step 4 – Bluetooth</div>
 <button type="button" class="custom-btn mb-2" onclick="scanBLE()">Scan BLE Devices</button>
 <p>Status: <span id="bleStatus" class="status-disconnected">Not Connected</span></p>
 
-
-<!-- STEP 5 -->
+<!-- ================= STEP 5 ================= -->
 <div class="section-title">Step 5 – Sensor Data</div>
 <button type="button" class="custom-btn mb-3" onclick="readSensor()">Read Sensor Data</button>
 
 <div class="row g-3">
     <div class="col-md-4">
-        <input class="form-control" name="temperature" placeholder="Temperature">
+        <div class="sensor-box">
+            <input class="form-control" name="temperature" placeholder="Temperature">
+        </div>
     </div>
     <div class="col-md-4">
-        <input class="form-control" name="ph" placeholder="pH">
+        <div class="sensor-box">
+            <input class="form-control" name="ph" placeholder="pH">
+        </div>
     </div>
     <div class="col-md-4">
-        <input class="form-control" name="tds" placeholder="TDS">
+        <div class="sensor-box">
+            <input class="form-control" name="tds" placeholder="TDS">
+        </div>
     </div>
 </div>
 
 <!-- OCEAN SENSORS -->
 <div id="oceanSensors" class="row g-3 mt-3" style="display:none;">
     <div class="col-md-4">
-        <input class="form-control" name="chlorophyll" placeholder="Chlorophyll">
+        <div class="sensor-box">
+            <input class="form-control" name="chlorophyll" placeholder="Chlorophyll">
+        </div>
     </div>
     <div class="col-md-4">
-        <input class="form-control" name="ta" placeholder="Total Alkalinity">
+        <div class="sensor-box">
+            <input class="form-control" name="ta" placeholder="Total Alkalinity">
+        </div>
     </div>
     <div class="col-md-4">
-        <input class="form-control" name="dic" placeholder="DIC">
+        <div class="sensor-box">
+            <input class="form-control" name="dic" placeholder="DIC">
+        </div>
     </div>
 </div>
 
 <!-- POND SENSORS -->
 <div id="pondSensors" class="row g-3 mt-3" style="display:none;">
     <div class="col-md-4">
-        <input class="form-control" name="do" placeholder="Dissolved Oxygen">
+        <div class="sensor-box">
+            <input class="form-control" name="do" placeholder="Dissolved Oxygen">
+        </div>
     </div>
 </div>
 
-
-<!-- STEP 6 -->
+<!-- ================= STEP 6 ================= -->
 <div class="section-title">Step 6 – Upload Image</div>
 <input type="file" name="image" class="form-control mb-3">
 
-<button type="submit" class="custom-btn">Save Data</button>
+<button type="submit" class="custom-btn w-100 mt-2">Save Data</button>
 
 </form>
+</div>
 </div>
 
 {% endblock %}
@@ -151,11 +188,11 @@ body {
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
 <script>
-let category = "{{ category }}";   // from Flask session
+let category = "{{ category }}";
 let map = null;
 let marker = null;
 
-// Load water types automatically
+// ================= LOAD WATER TYPES =================
 window.onload = function() {
 
     const dropdown = document.getElementById("waterType");
@@ -191,7 +228,7 @@ window.onload = function() {
 };
 
 
-// Location
+// ================= LOCATION =================
 function getLocation(){
     if(!navigator.geolocation) return;
 
@@ -226,7 +263,7 @@ function showMap(lat, lon){
 }
 
 
-// BLE
+// ================= BLE =================
 async function scanBLE(){
     const status = document.getElementById("bleStatus");
     try{
