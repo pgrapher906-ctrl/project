@@ -195,7 +195,6 @@ window.onload = function() {
             "Drinking Water",
             "Ground Water"
         ];
-        document.getElementById("pondSensors").style.display = "flex";
     }
 
     options.forEach(type => {
@@ -204,8 +203,8 @@ window.onload = function() {
         option.textContent = type;
         dropdown.appendChild(option);
     });
-};
 
+};
 
 // ================= LOCATION =================
 function getLocation(){
