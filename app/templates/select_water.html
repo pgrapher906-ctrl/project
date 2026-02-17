@@ -6,7 +6,7 @@
 <style>
 
 /* =========================================
-   MOBILE-FIRST CLEAN OCEAN BACKGROUND
+   RESPONSIVE OCEAN BACKGROUND
 ========================================= */
 
 .select-wrapper {
@@ -14,18 +14,18 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 20px;
+    padding: 30px 15px;
     position: relative;
 }
 
-/* Soft animated ocean glow */
+/* Soft animated glow */
 .select-wrapper::before {
     content: "";
     position: absolute;
-    bottom: -60px;
-    left: -20%;
-    width: 140%;
-    height: 300px;
+    bottom: -80px;
+    left: -15%;
+    width: 130%;
+    height: 320px;
     background: radial-gradient(circle at 50% 100%, rgba(26,188,156,0.20), transparent 70%);
     animation: waveMove 6s ease-in-out infinite alternate;
     z-index: 1;
@@ -37,26 +37,26 @@
 }
 
 /* =========================================
-   GLASS CONTAINER
+   CONTAINER
 ========================================= */
 
 .select-container {
     width: 100%;
-    max-width: 900px;
-    padding: 30px;
-    border-radius: 24px;
-    background: rgba(255,255,255,0.95);
+    max-width: 1100px; /* wider for laptop */
+    padding: 35px 40px;
+    border-radius: 26px;
+    background: rgba(255,255,255,0.96);
     backdrop-filter: blur(12px);
-    box-shadow: 0 25px 55px rgba(0,0,0,0.12);
+    box-shadow: 0 25px 60px rgba(0,0,0,0.12);
     position: relative;
     z-index: 10;
 }
 
 .select-title {
     font-weight: 600;
-    font-size: 20px;
+    font-size: 22px;
     color: #0A3D62;
-    margin-bottom: 30px;
+    margin-bottom: 40px;
 }
 
 /* =========================================
@@ -64,23 +64,24 @@
 ========================================= */
 
 .water-card {
-    border-radius: 20px;
-    padding: 18px;
+    border-radius: 22px;
+    padding: 22px;
     background: white;
-    box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.08);
     transition: all 0.3s ease;
+    height: 100%;
 }
 
 .water-card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 20px 45px rgba(0,0,0,0.12);
+    transform: translateY(-8px);
+    box-shadow: 0 25px 55px rgba(0,0,0,0.12);
 }
 
 /* Image */
 .water-preview {
-    height: 170px;
-    border-radius: 16px;
-    margin-bottom: 18px;
+    height: 190px;
+    border-radius: 18px;
+    margin-bottom: 20px;
     background-size: cover;
     background-position: center;
 }
@@ -88,19 +89,20 @@
 /* Titles */
 .water-title {
     font-weight: 600;
-    font-size: 16px;
-    margin-bottom: 15px;
+    font-size: 17px;
+    margin-bottom: 18px;
 }
 
 /* Buttons */
 .btn-ocean,
 .btn-pond {
     width: 100%;
-    padding: 11px;
-    border-radius: 12px;
+    padding: 12px;
+    border-radius: 14px;
     border: none;
     font-weight: 500;
     color: white;
+    font-size: 15px;
     transition: 0.3s ease;
 }
 
@@ -114,23 +116,49 @@
 
 .btn-ocean:hover,
 .btn-pond:hover {
-    transform: translateY(-2px);
-    opacity: 0.95;
+    transform: translateY(-3px);
+    opacity: 0.96;
 }
 
-/* Mobile spacing */
-@media (max-width: 768px) {
-    .select-container {
-        padding: 22px;
-    }
+/* =========================================
+   📱 MOBILE OPTIMIZATION
+========================================= */
 
-    .water-preview {
-        height: 150px;
+@media (max-width: 768px) {
+
+    .select-container {
+        padding: 25px 20px;
     }
 
     .select-title {
         font-size: 18px;
+        margin-bottom: 30px;
     }
+
+    .water-preview {
+        height: 160px;
+    }
+
+    .water-card {
+        padding: 18px;
+    }
+
+}
+
+/* =========================================
+   💻 LAPTOP OPTIMIZATION
+========================================= */
+
+@media (min-width: 992px) {
+
+    .water-preview {
+        height: 220px;
+    }
+
+    .select-title {
+        font-size: 24px;
+    }
+
 }
 
 </style>
@@ -145,7 +173,7 @@
         <div class="row g-4">
 
             <!-- OCEAN CARD -->
-            <div class="col-md-6">
+            <div class="col-12 col-md-6">
                 <div class="water-card text-center">
 
                     <div class="water-preview"
@@ -167,7 +195,7 @@
             </div>
 
             <!-- POND CARD -->
-            <div class="col-md-6">
+            <div class="col-12 col-md-6">
                 <div class="water-card text-center">
 
                     <div class="water-preview"
