@@ -70,7 +70,14 @@ class WaterData(db.Model):
     # -----------------------
     water_type = db.Column(db.String(100), nullable=False)
     pin_id = db.Column(db.String(100), nullable=False)
-    
+
+    # =======================
+    # OCEAN PARAMETERS
+    # =======================
+    chlorophyll = db.Column(db.Float)
+    ta = db.Column(db.Float)
+    dic = db.Column(db.Float)
+
     # =======================
     # COMMON PARAMETERS
     # =======================
