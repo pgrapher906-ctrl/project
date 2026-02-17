@@ -1,213 +1,131 @@
 /* ===================================
-   GLOBAL BACKGROUND
+   NEO-INDUSTRIAL CORE THEME
 =================================== */
+
+:root {
+    --charcoal: #121212;
+    --dark-surface: #1e1e1e;
+    --safety-orange: #FF6B00;
+    --dim-orange: rgba(255, 107, 0, 0.2);
+    --grid-color: rgba(255, 255, 255, 0.03);
+    --text-gray: #b3b3b3;
+}
 
 body {
     margin: 0;
     font-family: 'Poppins', sans-serif;
     min-height: 100vh;
-
-    background: linear-gradient(rgba(10,61,98,0.75), rgba(10,61,98,0.75)),
-                url("../images/water-bg.jpg") no-repeat center center fixed;
-
-    background-size: cover;
-    color: #0A3D62;
+    background-color: var(--charcoal);
+    /* Technical Grid Overlay */
+    background-image: 
+        linear-gradient(var(--grid-color) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+    background-size: 30px 30px;
+    color: white;
 }
 
-
 /* ===================================
-   NAVBAR
+   NAVBAR - RUGGED DESIGN
 =================================== */
 
 .navbar {
-    background: linear-gradient(90deg, #0A3D62, #145374);
-    padding: 14px 28px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    color: white;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    background: #000000;
+    border-bottom: 2px solid var(--safety-orange);
+    padding: 12px 28px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
 }
 
-.navbar-left {
-    font-weight: 600;
-    font-size: 18px;
-}
-
-.navbar-right {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.username {
-    font-size: 14px;
+.navbar-brand {
+    color: var(--safety-orange) !important;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 700 !important;
 }
 
 .logout-btn {
-    background: #1ABC9C;
-    border: none;
-    color: white;
+    background: transparent;
+    border: 1px solid var(--safety-orange);
+    color: var(--safety-orange);
     padding: 6px 18px;
-    border-radius: 8px;
+    border-radius: 4px;
     text-decoration: none;
-    font-size: 14px;
-    transition: 0.3s ease;
+    font-size: 13px;
+    font-weight: 600;
+    transition: 0.3s;
 }
 
 .logout-btn:hover {
-    background: #159c85;
+    background: var(--safety-orange);
+    color: black;
+    box-shadow: 0 0 15px var(--safety-orange);
 }
-
 
 /* ===================================
-   MAIN WRAPPER
+   CARD - GLASS/SURFACE DESIGN
 =================================== */
 
-main {
-    width: 95%;
-    max-width: 900px;
-    margin: 50px auto;
+.card, .glass-card, .select-container {
+    background: var(--dark-surface) !important;
+    border: 1px solid #333 !important;
+    border-top: 4px solid var(--safety-orange) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5) !important;
+    color: white !important;
 }
-
 
 /* ===================================
-   CARD DESIGN
+   FORM ELEMENTS & SENSORS
 =================================== */
 
-.card {
-    background: rgba(255,255,255,0.92);
-    backdrop-filter: blur(12px);
-    border-radius: 20px;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-    padding: 35px;
-    margin-bottom: 30px;
-}
-
-
-/* ===================================
-   LOGIN / REGISTER FORM CARD
-=================================== */
-
-.form-card {
-    max-width: 420px;
-    margin: 80px auto;
-}
-
-h2 {
-    text-align: center;
-    font-weight: 600;
-    margin-bottom: 25px;
-}
-
-
-/* ===================================
-   FORM ELEMENTS
-=================================== */
-
-.form-group {
-    margin-bottom: 18px;
-}
-
-.form-control {
-    width: 100%;
-    padding: 10px 14px;
-    border: 1px solid #d9e1ec;
-    border-radius: 8px;
-    background: #f9fbfd;
-    font-size: 14px;
-    transition: 0.2s ease;
+.form-control, .form-select {
+    background: #121212 !important;
+    border: 1px solid #444 !important;
+    color: white !important;
+    border-radius: 4px !important;
 }
 
 .form-control:focus {
-    outline: none;
-    border: 1.5px solid #1ABC9C;
-    background: white;
+    border-color: var(--safety-orange) !important;
+    box-shadow: 0 0 8px var(--dim-orange) !important;
 }
 
+.sensor-box {
+    background: #181818 !important;
+    border-left: 3px solid var(--safety-orange) !important;
+    border-radius: 4px !important;
+    padding: 15px;
+}
 
 /* ===================================
-   BUTTONS
+   INDUSTRIAL BUTTONS
 =================================== */
 
-.btn {
-    border: none;
-    padding: 10px 20px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 500;
-    transition: 0.3s ease;
+.btn-primary, .custom-btn, .btn-ocean, .btn-pond {
+    background: var(--safety-orange) !important;
+    color: black !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    border: none !important;
+    border-radius: 4px !important;
+    letter-spacing: 1px;
+    transition: 0.3s;
 }
 
-.btn-primary {
-    background: #1ABC9C;
-    color: white;
+.btn-primary:hover, .custom-btn:hover {
+    background: #e66000 !important;
+    box-shadow: 0 0 20px var(--dim-orange);
+    transform: translateY(-2px);
 }
-
-.btn-primary:hover {
-    background: #159c85;
-}
-
 
 /* ===================================
-   FLASH MESSAGES
+   WATER CARDS (SELECT PAGE)
 =================================== */
 
-.flashes {
-    list-style: none;
-    padding: 0;
-    margin-bottom: 20px;
+.water-card {
+    background: #1e1e1e !important;
+    border: 1px solid #333 !important;
 }
 
-.flash {
-    padding: 10px 15px;
-    border-radius: 8px;
-    margin-bottom: 10px;
-    font-size: 14px;
-}
-
-.flash.success {
-    background: #E8F8F5;
-    color: #1ABC9C;
-    border-left: 4px solid #1ABC9C;
-}
-
-.flash.danger {
-    background: #FDEDEC;
-    color: #E74C3C;
-    border-left: 4px solid #E74C3C;
-}
-
-
-/* ===================================
-   CENTER WRAPPER (LOGIN FIX)
-=================================== */
-
-.center-wrapper {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 80vh;
-}
-
-
-/* ===================================
-   RESPONSIVE
-=================================== */
-
-@media (max-width: 768px) {
-
-    .navbar {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
-    }
-
-    main {
-        margin: 20px auto;
-    }
-
-    .card {
-        padding: 25px;
-    }
+.water-title {
+    color: var(--safety-orange) !important;
 }
