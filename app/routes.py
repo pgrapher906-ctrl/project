@@ -13,13 +13,13 @@ from app.forms import LoginForm, RegistrationForm
 
 main = Blueprint("main", __name__)
 
-# --- FIX 1: CHANGE UPLOAD FOLDER TO /tmp ---
+# --- Vercel Fix: Use /tmp for writable operations ---
 UPLOAD_FOLDER = "/tmp" 
 IST = pytz.timezone("Asia/Kolkata")
 
 
 # =====================================================
-# SPLASH SCREEN (NEW)
+# SPLASH SCREEN
 # =====================================================
 @main.route("/")
 def splash():
@@ -121,7 +121,7 @@ def logout():
 
 
 # =====================================================
-# SAVE DATA (FIXED FOR VERCEL)
+# SAVE DATA (FIXED FOR VERCEL & MATCHED TO MODELS.PY)
 # =====================================================
 @main.route("/save_data", methods=["POST"])
 @login_required
@@ -134,6 +134,7 @@ def save_data():
 
     data = request.form
 
+    # Basic Validation
     if not data.get("latitude") or not data.get("longitude"):
         flash("Location is required.", "danger")
         return redirect(url_for("main.dashboard"))
@@ -146,7 +147,7 @@ def save_data():
         flash("Please select water type.", "danger")
         return redirect(url_for("main.dashboard"))
 
-    # --- FIX 2: CREATE DIR IN /TMP ---
+    # Create writable directory in /tmp
     os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
     image = request.files.get("image")
@@ -156,11 +157,9 @@ def save_data():
         filename = secure_filename(image.filename)
         timestamp_str = datetime.now().strftime("%Y%m%d%H%M%S")
         filename = f"{timestamp_str}_{filename}"
-
+        
         save_path = os.path.join(UPLOAD_FOLDER, filename)
         image.save(save_path)
-
-        # We store just the filename or the temp path
         image_path = filename
 
     def to_float(value):
@@ -171,15 +170,13 @@ def save_data():
 
     current_time = datetime.now(IST)
 
+    # Creating database entry (Parameters match your updated models.py)
     entry = WaterData(
         user_id=current_user.id,
         latitude=to_float(data.get("latitude")),
         longitude=to_float(data.get("longitude")),
         water_type=data.get("water_type"),
         pin_id=data.get("pin_id"),
-        chlorophyll=to_float(data.get("chlorophyll")) if category == "ocean" else None,
-        ta=to_float(data.get("ta")) if category == "ocean" else None,
-        dic=to_float(data.get("dic")) if category == "ocean" else None,
         temperature=to_float(data.get("temperature")),
         ph=to_float(data.get("ph")),
         tds=to_float(data.get("tds")),
