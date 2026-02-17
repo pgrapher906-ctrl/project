@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Smart Water Monitoring</title>
+    <title>Smart Water Monitoring | System Start</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap" rel="stylesheet">
     <style>
         body {
             margin: 0;
@@ -12,77 +12,56 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            background: linear-gradient(180deg, #0A3D62, #1ABC9C);
+            background-color: #121212;
+            background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
             overflow: hidden;
             font-family: 'Poppins', sans-serif;
         }
 
-        /* Soft water ripple effect */
-        body::before {
-            content: "";
-            position: absolute;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.08) 10%, transparent 40%);
-            animation: ripple 10s linear infinite;
-        }
-
-        @keyframes ripple {
-            0% { transform: scale(1) rotate(0deg); }
-            50% { transform: scale(1.15) rotate(180deg); }
-            100% { transform: scale(1) rotate(360deg); }
-        }
-
         .logo-container {
-            position: relative;
             text-align: center;
             cursor: pointer;
             z-index: 2;
-            animation: fadeIn 1.2s ease-in-out;
+            padding: 40px;
+            border: 2px solid #FF6B00;
+            background: rgba(0,0,0,0.8);
+            box-shadow: 0 0 30px rgba(255, 107, 0, 0.2);
         }
 
         .logo-container img {
-            width: 150px;
+            width: 120px;
+            filter: grayscale(1) brightness(1.5) sepia(1) hue-rotate(-30deg) saturate(5);
             margin-bottom: 20px;
-            transition: transform 0.3s ease;
-        }
-
-        .logo-container:hover img {
-            transform: scale(1.08);
         }
 
         .title {
-            color: white;
-            font-size: 22px;
-            font-weight: 600;
-            letter-spacing: 1px;
+            color: #FF6B00;
+            font-size: 28px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 4px;
         }
 
         .subtitle {
-            color: rgba(255,255,255,0.85);
-            font-size: 14px;
-            margin-top: 6px;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            color: #888;
+            font-size: 12px;
+            margin-top: 10px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
         }
     </style>
 </head>
-
 <body>
 
 <div class="logo-container" onclick="goToLogin()">
     <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo">
-    <div class="title">Smart Water Monitoring</div>
-    <div class="subtitle">IoT Based Water Quality System</div>
+    <div class="title">System Start</div>
+    <div class="subtitle">Smart Water Monitoring IoT v2.0</div>
 </div>
 
 <script>
-    function goToLogin(){
-        window.location.href = "{{ url_for('main.login') }}";
-    }
+    function goToLogin(){ window.location.href = "{{ url_for('main.login') }}"; }
 </script>
 
 </body>
