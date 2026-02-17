@@ -143,7 +143,26 @@ body {
         </div>
     </div>
 </div>
-   
+
+<!-- OCEAN SENSORS -->
+<div id="oceanSensors" class="row g-3 mt-3" style="display:none;">
+    <div class="col-md-4">
+        <div class="sensor-box">
+            <input class="form-control" name="chlorophyll" placeholder="Chlorophyll">
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="sensor-box">
+            <input class="form-control" name="ta" placeholder="Total Alkalinity">
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="sensor-box">
+            <input class="form-control" name="dic" placeholder="DIC">
+        </div>
+    </div>
+</div>
+
 <!-- POND SENSORS -->
 <div id="pondSensors" class="row g-3 mt-3" style="display:none;">
     <div class="col-md-4">
@@ -188,7 +207,7 @@ window.onload = function() {
             "Deep Sea Water",
             "Marine Surface Water"
         ];
-       
+        document.getElementById("oceanSensors").style.display = "flex";
     }
 
     if (category === "pond") {
