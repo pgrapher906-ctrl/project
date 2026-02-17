@@ -7,17 +7,42 @@
 <style>
 
 /* ==============================
-   CLEAN MOBILE SCIENTIFIC UI
+   ANIMATED WATER BACKGROUND ONLY
 ============================== */
 
 body {
-    background: #F4F6F9;
+    background: linear-gradient(180deg, #0A3D62 0%, #1ABC9C 100%);
+    overflow-x: hidden;
 }
+
+/* Soft moving water effect */
+body::before {
+    content: "";
+    position: fixed;
+    bottom: -80px;
+    left: -50%;
+    width: 200%;
+    height: 300px;
+    background: radial-gradient(circle at 50% 100%, rgba(255,255,255,0.18), transparent 70%);
+    animation: waveMove 7s ease-in-out infinite alternate;
+    z-index: 0;
+}
+
+@keyframes waveMove {
+    from { transform: translateX(-5%); }
+    to { transform: translateX(5%); }
+}
+
+/* ==============================
+   ORIGINAL UI (UNCHANGED)
+============================== */
 
 .dashboard-wrapper {
     max-width: 950px;
     margin: 30px auto;
     padding: 20px;
+    position: relative;
+    z-index: 10;
 }
 
 .glass-card {
@@ -182,102 +207,4 @@ body {
 </div>
 </div>
 
-{% endblock %}
-
-{% block scripts %}
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-
-<script>
-let category = "{{ category }}";
-let map = null;
-let marker = null;
-
-// ================= LOAD WATER TYPES =================
-window.onload = function() {
-
-    const dropdown = document.getElementById("waterType");
-
-    let options = [];
-
-    if (category === "ocean") {
-        options = [
-            "Open Ocean Water",
-            "Coastal Water",
-            "Estuarine Water",
-            "Deep Sea Water",
-            "Marine Surface Water"
-        ];
-        document.getElementById("oceanSensors").style.display = "flex";
-    }
-
-    if (category === "pond") {
-        options = [
-            "Pond Water",
-            "Drinking Water",
-            "Ground Water"
-        ];
-        document.getElementById("pondSensors").style.display = "flex";
-    }
-
-    options.forEach(type => {
-        let option = document.createElement("option");
-        option.value = type;
-        option.textContent = type;
-        dropdown.appendChild(option);
-    });
-};
-
-
-// ================= LOCATION =================
-function getLocation(){
-    if(!navigator.geolocation) return;
-
-    navigator.geolocation.getCurrentPosition(function(pos){
-        const lat = pos.coords.latitude;
-        const lon = pos.coords.longitude;
-
-        document.getElementById("latitude").value = lat;
-        document.getElementById("longitude").value = lon;
-
-        showMap(lat, lon);
-    });
-}
-
-function showMap(lat, lon){
-    document.getElementById("map").style.display = "block";
-
-    if(!map){
-        map = L.map('map').setView([lat, lon], 13);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-    } else {
-        map.setView([lat, lon], 13);
-    }
-
-    if(marker){
-        marker.setLatLng([lat, lon]);
-    } else {
-        marker = L.marker([lat, lon]).addTo(map);
-    }
-
-    map.invalidateSize();
-}
-
-
-// ================= BLE =================
-async function scanBLE(){
-    const status = document.getElementById("bleStatus");
-    try{
-        await navigator.bluetooth.requestDevice({acceptAllDevices:true});
-        status.innerText="Connected";
-        status.className="status-connected";
-    }catch{
-        status.innerText="Not Connected";
-        status.className="status-disconnected";
-    }
-}
-
-function readSensor(){
-    alert("ESP32 integration required.");
-}
-</script>
 {% endblock %}
