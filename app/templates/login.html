@@ -1,83 +1,157 @@
 {% extends 'base.html' %}
-{% block title %}System Access | Login{% endblock %}
+{% block title %}Login | Smart Water Monitoring{% endblock %}
 
 {% block content %}
+
 <style>
+
 /* =========================================
-   ECO-FLUID LOGIN DESIGN
+   SOFT OCEAN BACKGROUND (MOBILE FIRST)
 ========================================= */
+
 .login-wrapper {
-    min-height: 80vh;
+    min-height: 85vh;
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
     padding: 20px;
 }
+
+/* Soft wave overlay */
+.login-wrapper::before {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    width: 200%;
+    height: 300px;
+    background: radial-gradient(circle at 50% 100%, rgba(26,188,156,0.25), transparent 70%);
+    animation: waveMove 8s ease-in-out infinite alternate;
+    z-index: 1;
+}
+
+@keyframes waveMove {
+    from { transform: translateX(-5%); }
+    to { transform: translateX(5%); }
+}
+
+/* =========================================
+   GLASS LOGIN CARD
+========================================= */
 
 .login-card {
     width: 100%;
     max-width: 420px;
+    padding: 35px;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 20px 45px rgba(0,0,0,0.15);
+    position: relative;
+    z-index: 10;
 }
 
+/* Title */
 .login-card h2 {
-    font-weight: 700;
-    text-align: center;
-    margin-bottom: 30px;
-    color: #154360;
-}
-
-.form-label {
     font-weight: 600;
-    color: #148F77;
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    margin-bottom: 8px;
+    text-align: center;
+    margin-bottom: 25px;
+    color: #0A3D62;
 }
 
+/* Input Fields */
+.form-control {
+    border-radius: 10px;
+    padding: 12px;
+    border: 1px solid #e1e8ef;
+    transition: 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: #1ABC9C;
+    box-shadow: 0 0 0 0.15rem rgba(26,188,156,0.25);
+}
+
+/* Remember checkbox spacing */
+.form-check-label {
+    font-size: 14px;
+}
+
+/* Button */
+.btn-primary {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    background: linear-gradient(90deg, #0A3D62, #1ABC9C);
+    border: none;
+    font-weight: 500;
+    transition: 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    opacity: 0.95;
+}
+
+/* Footer */
 .login-footer {
     text-align: center;
-    margin-top: 25px;
-    font-size: 0.9rem;
-    color: #5D6D7E;
+    margin-top: 18px;
+    font-size: 14px;
 }
 
 .login-footer a {
-    color: #148F77;
-    font-weight: 600;
+    color: #0A3D62;
+    font-weight: 500;
     text-decoration: none;
 }
+
+.login-footer a:hover {
+    text-decoration: underline;
+}
+
+/* Mobile Adjustments */
+@media (max-width: 480px) {
+    .login-card {
+        padding: 25px;
+    }
+}
+
 </style>
 
 <div class="login-wrapper">
-    <div class="glass-card login-card">
-        <h2>System Access</h2>
+
+    <div class="login-card">
+        <h2>Login</h2>
 
         <form method="POST">
             {{ form.hidden_tag() }}
 
             <div class="mb-3">
-                <label class="form-label">Operator Email</label>
-                {{ form.email(class="form-control", placeholder="Enter network email") }}
+                {{ form.email.label(class="form-label") }}
+                {{ form.email(class="form-control", placeholder="Enter your email") }}
             </div>
 
             <div class="mb-3">
-                <label class="form-label">Access Key</label>
-                {{ form.password(class="form-control", placeholder="Enter password") }}
+                {{ form.password.label(class="form-label") }}
+                {{ form.password(class="form-control", placeholder="Enter your password") }}
             </div>
 
-            <div class="form-check mb-4">
+            <div class="form-check mb-3">
                 {{ form.remember(class="form-check-input") }}
-                <label class="form-check-label small text-muted" for="remember">Keep session active</label>
+                {{ form.remember.label(class="form-check-label") }}
             </div>
 
-            <button type="submit" class="btn-primary w-100 py-3">Initialize Login</button>
+            {{ form.submit(class="btn btn-primary") }}
 
             <div class="login-footer">
-                Unauthorized access is prohibited_ 
-                <br>
-                <a href="{{ url_for('main.register') }}">Request New Enrollment</a>
+                Don't have an account?
+                <a href="{{ url_for('main.register') }}">Register</a>
             </div>
+
         </form>
     </div>
+
 </div>
+
 {% endblock %}
