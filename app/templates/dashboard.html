@@ -4,52 +4,58 @@
 {% block head %}
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
 <style>
-    .section-title { color: #148F77; font-size: 0.9rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-top: 30px; }
-    #map { height: 250px; border-radius: 20px; border: 4px solid white; margin-top: 15px; display: none; }
+    .section-title { color: #148F77; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-top: 30px; margin-bottom: 10px; }
+    #map { height: 280px; border-radius: 20px; border: 4px solid white; margin-top: 15px; display: none; }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="dashboard-wrapper">
-    <div class="glass-card border-0">
-        <h3 class="fw-bold mb-4" style="color: #154360;">Sensor Dashboard</h3>
+<div class="dashboard-wrapper pb-5">
+    <div class="glass-card">
+        <h3 class="fw-bold mb-4" style="color: #154360;">Water Quality Data Entry</h3>
         <form method="POST" action="{{ url_for('main.save_data') }}" enctype="multipart/form-data">
-            <div class="section-title">01. Geo-Location</div>
-            <button type="button" class="btn btn-sm btn-outline-primary rounded-pill mb-3" onclick="getLocation()">Find Coordinates</button>
-            <div class="row g-2">
-                <div class="col-6"><input type="text" id="latitude" name="latitude" class="form-control" placeholder="Lat" required></div>
-                <div class="col-6"><input type="text" id="longitude" name="longitude" class="form-control" placeholder="Long" required></div>
+            
+            <div class="section-title">Step 1 – Detect Location</div>
+            <button type="button" class="custom-btn mb-3" onclick="getLocation()">Detect Location</button>
+            <div class="row g-3">
+                <div class="col-md-6"><input type="text" id="latitude" name="latitude" class="form-control" placeholder="Latitude" required></div>
+                <div class="col-md-6"><input type="text" id="longitude" name="longitude" class="form-control" placeholder="Longitude" required></div>
             </div>
             <div id="map"></div>
 
-            <div class="section-title">02. Environment & ID</div>
-            <div class="row g-2">
-                <div class="col-md-6"><select class="form-select" id="waterType" name="water_type" required></select></div>
-                <div class="col-md-6"><input type="text" name="pin_id" class="form-control" placeholder="System Pin ID" required></div>
-            </div>
-
-            <div class="section-title">03. Real-Time Telemetry</div>
-            <button type="button" class="btn btn-sm btn-outline-info rounded-pill mb-2" onclick="scanBLE()">Sync Sensors</button>
-            <p class="small text-muted">Status: <span id="bleStatus" class="fw-bold">Awaiting Sync</span></p>
-
+            <div class="section-title">Step 2 & 3 – Environment & ID</div>
             <div class="row g-3">
-                <div class="col-4"><div class="sensor-box p-3 text-center"><label class="small text-muted">TEMP</label><input class="form-control text-center border-0 p-0 fw-bold" name="temperature"></div></div>
-                <div class="col-4"><div class="sensor-box p-3 text-center"><label class="small text-muted">PH</label><input class="form-control text-center border-0 p-0 fw-bold" name="ph"></div></div>
-                <div class="col-4"><div class="sensor-box p-3 text-center"><label class="small text-muted">TDS</label><input class="form-control text-center border-0 p-0 fw-bold" name="tds"></div></div>
+                <div class="col-md-6"><select class="form-select" id="waterType" name="water_type" required><option value="">Select Water Type</option></select></div>
+                <div class="col-md-6"><input type="text" name="pin_id" class="form-control" placeholder="Enter Pin ID" required></div>
             </div>
 
-            <div id="oceanSensors" class="row g-3 mt-1" style="display:none;">
-                <div class="col-4"><div class="sensor-box p-3 text-center"><label class="small text-muted">DIC</label><input class="form-control text-center border-0 p-0 fw-bold" name="dic"></div></div>
+            <div class="section-title">Step 4 – Bluetooth Connectivity</div>
+            <button type="button" class="custom-btn mb-2" onclick="scanBLE()">Scan BLE Devices</button>
+            <p class="small text-muted">Status: <span id="bleStatus" class="fw-bold text-danger">Not Connected</span></p>
+
+            <div class="section-title">Step 5 – Sensor Telemetry</div>
+            <button type="button" class="custom-btn mb-3" onclick="readSensor()">Read Sensor Data</button>
+
+            <div class="row g-3 mb-3">
+                <div class="col-md-4"><div class="sensor-box"><label>Temperature</label><input class="form-control border-0 p-0 fw-bold" name="temperature"></div></div>
+                <div class="col-md-4"><div class="sensor-box"><label>pH Level</label><input class="form-control border-0 p-0 fw-bold" name="ph"></div></div>
+                <div class="col-md-4"><div class="sensor-box"><label>TDS</label><input class="form-control border-0 p-0 fw-bold" name="tds"></div></div>
             </div>
-            
+
+            <div id="oceanSensors" class="row g-3" style="display:none;">
+                <div class="col-md-4"><div class="sensor-box"><label>Chlorophyll</label><input class="form-control border-0 p-0 fw-bold" name="chlorophyll"></div></div>
+                <div class="col-md-4"><div class="sensor-box"><label>Total Alkalinity</label><input class="form-control border-0 p-0 fw-bold" name="ta"></div></div>
+                <div class="col-md-4"><div class="sensor-box"><label>DIC</label><input class="form-control border-0 p-0 fw-bold" name="dic"></div></div>
+            </div>
+
             <div id="pondSensors" class="row g-3 mt-1" style="display:none;">
-                <div class="col-12"><div class="sensor-box p-3 text-center"><label class="small text-muted">OXYGEN</label><input class="form-control text-center border-0 p-0 fw-bold" name="do"></div></div>
+                <div class="col-md-12"><div class="sensor-box"><label>Dissolved Oxygen</label><input class="form-control border-0 p-0 fw-bold" name="do"></div></div>
             </div>
 
-            <div class="section-title">04. Visual Evidence</div>
-            <input type="file" name="image" class="form-control">
+            <div class="section-title">Step 6 – Visual Evidence</div>
+            <input type="file" name="image" class="form-control mb-4">
 
-            <button type="submit" class="btn-primary w-100 py-3 mt-5">SUBMIT & ANALYZE</button>
+            <button type="submit" class="custom-btn w-100 py-3 mt-2">TRANSMIT DATA</button>
         </form>
     </div>
 </div>
@@ -62,10 +68,10 @@ let category = "{{ category }}";
 let map = null;
 window.onload = function() {
     const dropdown = document.getElementById("waterType");
-    let opts = category === "ocean" ? ["Coastal Water", "Deep Sea", "Estuarine"] : ["Pond Water", "Drinking Water"];
+    let options = category === "ocean" ? ["Open Ocean", "Coastal", "Estuarine", "Deep Sea"] : ["Pond Water", "Drinking Water", "Ground Water"];
     if (category === "ocean") document.getElementById("oceanSensors").style.display = "flex";
     if (category === "pond") document.getElementById("pondSensors").style.display = "flex";
-    opts.forEach(t => { let o = document.createElement("option"); o.value = t; o.textContent = t; dropdown.appendChild(o); });
+    options.forEach(t => { let o = document.createElement("option"); o.value = t; o.textContent = t; dropdown.appendChild(o); });
 };
 function getLocation(){
     navigator.geolocation.getCurrentPosition(pos => {
@@ -81,6 +87,10 @@ function showMap(lat, lon){
         L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(map);
     }
     L.marker([lat, lon]).addTo(map);
+}
+async function scanBLE(){
+    try { await navigator.bluetooth.requestDevice({acceptAllDevices:true}); document.getElementById("bleStatus").innerText="Connected"; document.getElementById("bleStatus").className="fw-bold text-success"; }
+    catch { alert("BLE Request Cancelled"); }
 }
 </script>
 {% endblock %}
