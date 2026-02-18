@@ -1,38 +1,196 @@
 {% extends 'base.html' %}
+{% block title %}Select Monitoring Type | Smart Water Monitoring{% endblock %}
+
 {% block content %}
-<div class="container text-center py-5">
-    <h2 class="mb-5 fw-bold" style="color: #154360;">Location Selection</h2>
-    <div class="row justify-content-center g-5">
-        <div class="col-md-5">
-            <div class="card border-0 p-0 overflow-hidden" style="border-radius: 30px;">
-                <div style="height:200px; background: linear-gradient(135deg, #154360, #1ABC9C); display:flex; align-items:center; justify-content:center;">
-                    <span style="font-size: 60px;">🌊</span>
-                </div>
-                <div class="p-4">
-                    <h4 class="fw-bold">Deep Sea Array</h4>
-                    <p class="text-muted small">Oceanic Salinity & pH Monitoring</p>
+
+<style>
+
+/* =========================================
+   MOBILE-FIRST CLEAN OCEAN BACKGROUND
+========================================= */
+
+.select-wrapper {
+    min-height: 88vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    position: relative;
+}
+
+/* Soft animated ocean glow */
+.select-wrapper::before {
+    content: "";
+    position: absolute;
+    bottom: -60px;
+    left: -20%;
+    width: 140%;
+    height: 300px;
+    background: radial-gradient(circle at 50% 100%, rgba(26,188,156,0.20), transparent 70%);
+    animation: waveMove 6s ease-in-out infinite alternate;
+    z-index: 1;
+}
+
+@keyframes waveMove {
+    from { transform: translateX(-4%); }
+    to { transform: translateX(4%); }
+}
+
+/* =========================================
+   GLASS CONTAINER
+========================================= */
+
+.select-container {
+    width: 100%;
+    max-width: 900px;
+    padding: 30px;
+    border-radius: 24px;
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 25px 55px rgba(0,0,0,0.12);
+    position: relative;
+    z-index: 10;
+}
+
+.select-title {
+    font-weight: 600;
+    font-size: 20px;
+    color: #0A3D62;
+    margin-bottom: 30px;
+}
+
+/* =========================================
+   WATER CARDS
+========================================= */
+
+.water-card {
+    border-radius: 20px;
+    padding: 18px;
+    background: white;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+}
+
+.water-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 45px rgba(0,0,0,0.12);
+}
+
+/* Image */
+.water-preview {
+    height: 170px;
+    border-radius: 16px;
+    margin-bottom: 18px;
+    background-size: cover;
+    background-position: center;
+}
+
+/* Titles */
+.water-title {
+    font-weight: 600;
+    font-size: 16px;
+    margin-bottom: 15px;
+}
+
+/* Buttons */
+.btn-ocean,
+.btn-pond {
+    width: 100%;
+    padding: 11px;
+    border-radius: 12px;
+    border: none;
+    font-weight: 500;
+    color: white;
+    transition: 0.3s ease;
+}
+
+.btn-ocean {
+    background: linear-gradient(90deg, #0A3D62, #1ABC9C);
+}
+
+.btn-pond {
+    background: linear-gradient(90deg, #1ABC9C, #16A085);
+}
+
+.btn-ocean:hover,
+.btn-pond:hover {
+    transform: translateY(-2px);
+    opacity: 0.95;
+}
+
+/* Mobile spacing */
+@media (max-width: 768px) {
+    .select-container {
+        padding: 22px;
+    }
+
+    .water-preview {
+        height: 150px;
+    }
+
+    .select-title {
+        font-size: 18px;
+    }
+}
+
+</style>
+
+<div class="select-wrapper">
+    <div class="select-container">
+
+        <h2 class="select-title text-center">
+            Select Monitoring Location
+        </h2>
+
+        <div class="row g-4">
+
+            <!-- OCEAN CARD -->
+            <div class="col-md-6">
+                <div class="water-card text-center">
+
+                    <div class="water-preview"
+                         style="background-image: url('{{ url_for('static', filename='images/ocean.jpg') }}');">
+                    </div>
+
+                    <h5 class="water-title text-primary">
+                        🌊 Ocean Monitoring
+                    </h5>
+
                     <form method="POST" action="{{ url_for('main.select_water') }}">
                         <input type="hidden" name="water_type" value="ocean">
-                        <button type="submit" class="btn-primary w-100">SELECT & MONITOR</button>
+                        <button type="submit" class="btn-ocean">
+                            Enter Ocean Monitoring
+                        </button>
                     </form>
+
                 </div>
             </div>
-        </div>
-        <div class="col-md-5">
-            <div class="card border-0 p-0 overflow-hidden" style="border-radius: 30px;">
-                <div style="height:200px; background: linear-gradient(135deg, #1ABC9C, #D1F2EB); display:flex; align-items:center; justify-content:center;">
-                    <span style="font-size: 60px;">🏞️</span>
-                </div>
-                <div class="p-4">
-                    <h4 class="fw-bold">Coastal Reefs</h4>
-                    <p class="text-muted small">Local Pond & Freshwater Analysis</p>
+
+            <!-- POND CARD -->
+            <div class="col-md-6">
+                <div class="water-card text-center">
+
+                    <div class="water-preview"
+                         style="background-image: url('{{ url_for('static', filename='images/pond.jpg') }}');">
+                    </div>
+
+                    <h5 class="water-title text-success">
+                        🏞 Pond Monitoring
+                    </h5>
+
                     <form method="POST" action="{{ url_for('main.select_water') }}">
                         <input type="hidden" name="water_type" value="pond">
-                        <button type="submit" class="btn-primary w-100">SELECT & MONITOR</button>
+                        <button type="submit" class="btn-pond">
+                            Enter Pond Monitoring
+                        </button>
                     </form>
+
                 </div>
             </div>
+
         </div>
+
     </div>
 </div>
+
 {% endblock %}
