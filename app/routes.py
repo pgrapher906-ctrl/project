@@ -184,3 +184,25 @@ def save_data():
 
     flash("Water data saved successfully ✔", "success")
     return redirect(url_for("main.dashboard"))
+
+# =====================================================
+# 🛠️ TEMPORARY FIX: RESET DATABASE
+# =====================================================
+@main.route("/fix_database_now")
+@login_required
+def fix_database():
+    # This forces the database to delete the old broken table
+    # and create the new correct one with 'Text' support.
+    try:
+        db.create_all() # Ensures connection
+        
+        # 1. Drop the old table
+        WaterData.__table__.drop(db.engine)
+        
+        # 2. Create the new table
+        WaterData.__table__.create(db.engine)
+        
+        return "✅ SUCCESS! Database fixed. You can now upload images."
+    except Exception as e:
+        return f"❌ Error: {e}"
+        
