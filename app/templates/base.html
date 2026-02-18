@@ -20,12 +20,12 @@
 
         {% if current_user.is_authenticated %}
         <div class="d-flex align-items-center gap-3">
-            <span class="fw-semibold text-muted" onclick="toggleUserInfo(event)" style="cursor:pointer;">
-                💧 {{ current_user.username }}
-            </span>
-            <div id="userInfoPopup" class="info-popup card position-absolute p-3 shadow-lg border-0" style="display:none; right:10%; top:60px; z-index:1000; min-width:200px; border-radius:15px;">
-                <p class="mb-1 small text-muted">Operator Session</p>
-                <p class="mb-0"><strong>Visits:</strong> {{ current_user.visit_count }}</p>
+            <div class="fw-semibold" onclick="toggleUserInfo(event)" style="cursor:pointer; color: var(--deep-blue);">
+                👤 {{ current_user.username }}
+            </div>
+            <div id="userInfoPopup" class="glass-card position-absolute p-3" style="display:none; right:10%; top:70px; z-index:1000; min-width:220px;">
+                <p class="mb-1 small"><strong>User:</strong> {{ current_user.username }}</p>
+                <p class="mb-0 small"><strong>Visits:</strong> {{ current_user.visit_count }}</p>
             </div>
             <a href="{{ url_for('main.logout') }}" class="btn btn-sm btn-outline-danger rounded-pill px-3">Logout</a>
         </div>
@@ -33,11 +33,11 @@
     </div>
 </nav>
 
-<div class="container py-4">
+<div class="container mt-4">
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             {% for category, message in messages %}
-                <div class="alert alert-{{ category }} rounded-4 border-0 shadow-sm mt-3" role="alert">
+                <div class="alert alert-{{ category }} rounded-4 border-0 shadow-sm mb-4">
                     {{ message }}
                 </div>
             {% endfor %}
@@ -56,6 +56,5 @@ document.addEventListener("click", () => {
     document.getElementById("userInfoPopup").style.display = "none";
 });
 </script>
-{% block scripts %}{% endblock %}
 </body>
 </html>
