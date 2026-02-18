@@ -89,7 +89,8 @@ class WaterData(db.Model):
     # -----------------------
     # IMAGE
     # -----------------------
-    image_path = db.Column(db.String(300))
+    # CHANGED FROM String(300) TO Text TO STORE BASE64 DATA
+    image_path = db.Column(db.Text)
 
     def __repr__(self):
         return f"<WaterData {self.water_type} - {self.timestamp}>"
