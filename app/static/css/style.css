@@ -1,213 +1,84 @@
 /* ===================================
-   GLOBAL BACKGROUND
+   ECO-FLUID (GEOMETRIC) CORE THEME
 =================================== */
+
+:root {
+    --mint-light: #D1F2EB;
+    --ocean-teal: #148F77;
+    --deep-blue: #154360;
+    --clean-white: #ffffff;
+    --bubble-bg: rgba(255, 255, 255, 0.9);
+}
 
 body {
     margin: 0;
     font-family: 'Poppins', sans-serif;
     min-height: 100vh;
-
-    background: linear-gradient(rgba(10,61,98,0.75), rgba(10,61,98,0.75)),
-                url("../images/water-bg.jpg") no-repeat center center fixed;
-
-    background-size: cover;
-    color: #0A3D62;
+    /* Low-Poly Geometric Wave Pattern */
+    background-color: #f0f7f4;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cpath d='M0 100 L100 100 L100 0 Q50 50 0 0 Z' fill='%23d1f2eb' fill-opacity='0.4'/%3E%3C/svg%3E");
+    background-attachment: fixed;
+    color: var(--deep-blue);
 }
 
-
 /* ===================================
-   NAVBAR
+   NAVBAR & BUTTONS
 =================================== */
 
 .navbar {
-    background: linear-gradient(90deg, #0A3D62, #145374);
-    padding: 14px 28px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    color: white;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    background: var(--clean-white);
+    border-bottom: 3px solid var(--ocean-teal);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
 }
 
-.navbar-left {
-    font-weight: 600;
-    font-size: 18px;
+.navbar-brand {
+    color: var(--deep-blue) !important;
+    font-weight: 700 !important;
 }
 
-.navbar-right {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.username {
-    font-size: 14px;
-}
-
-.logout-btn {
-    background: #1ABC9C;
-    border: none;
-    color: white;
-    padding: 6px 18px;
-    border-radius: 8px;
-    text-decoration: none;
-    font-size: 14px;
+.btn-primary, .custom-btn, .btn-ocean, .btn-pond {
+    background: var(--ocean-teal) !important;
+    border: none !important;
+    border-radius: 30px !important; /* Bubble rounded style */
+    padding: 10px 25px !important;
+    font-weight: 600 !important;
+    color: white !important;
     transition: 0.3s ease;
-}
-
-.logout-btn:hover {
-    background: #159c85;
-}
-
-
-/* ===================================
-   MAIN WRAPPER
-=================================== */
-
-main {
-    width: 95%;
-    max-width: 900px;
-    margin: 50px auto;
-}
-
-
-/* ===================================
-   CARD DESIGN
-=================================== */
-
-.card {
-    background: rgba(255,255,255,0.92);
-    backdrop-filter: blur(12px);
-    border-radius: 20px;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-    padding: 35px;
-    margin-bottom: 30px;
-}
-
-
-/* ===================================
-   LOGIN / REGISTER FORM CARD
-=================================== */
-
-.form-card {
-    max-width: 420px;
-    margin: 80px auto;
-}
-
-h2 {
-    text-align: center;
-    font-weight: 600;
-    margin-bottom: 25px;
-}
-
-
-/* ===================================
-   FORM ELEMENTS
-=================================== */
-
-.form-group {
-    margin-bottom: 18px;
-}
-
-.form-control {
-    width: 100%;
-    padding: 10px 14px;
-    border: 1px solid #d9e1ec;
-    border-radius: 8px;
-    background: #f9fbfd;
-    font-size: 14px;
-    transition: 0.2s ease;
-}
-
-.form-control:focus {
-    outline: none;
-    border: 1.5px solid #1ABC9C;
-    background: white;
-}
-
-
-/* ===================================
-   BUTTONS
-=================================== */
-
-.btn {
-    border: none;
-    padding: 10px 20px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 500;
-    transition: 0.3s ease;
-}
-
-.btn-primary {
-    background: #1ABC9C;
-    color: white;
+    box-shadow: 0 4px 10px rgba(20, 143, 119, 0.2);
 }
 
 .btn-primary:hover {
-    background: #159c85;
+    background: var(--deep-blue) !important;
+    transform: translateY(-2px);
 }
-
 
 /* ===================================
-   FLASH MESSAGES
+   CARDS & INPUTS
 =================================== */
 
-.flashes {
-    list-style: none;
-    padding: 0;
-    margin-bottom: 20px;
+.card, .glass-card, .select-container, .register-card, .login-card {
+    background: var(--bubble-bg) !important;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.3) !important;
+    border-radius: 25px !important;
+    box-shadow: 0 15px 35px rgba(21, 67, 96, 0.08) !important;
+    padding: 30px !important;
 }
 
-.flash {
-    padding: 10px 15px;
-    border-radius: 8px;
-    margin-bottom: 10px;
-    font-size: 14px;
+.form-control {
+    background: #ffffff !important;
+    border: 1.5px solid #E5E8E8 !important;
+    border-radius: 12px !important;
+    color: var(--deep-blue) !important;
 }
 
-.flash.success {
-    background: #E8F8F5;
-    color: #1ABC9C;
-    border-left: 4px solid #1ABC9C;
+.form-control:focus {
+    border-color: var(--ocean-teal) !important;
+    box-shadow: 0 0 0 0.2rem rgba(20, 143, 119, 0.1) !important;
 }
 
-.flash.danger {
-    background: #FDEDEC;
-    color: #E74C3C;
-    border-left: 4px solid #E74C3C;
-}
-
-
-/* ===================================
-   CENTER WRAPPER (LOGIN FIX)
-=================================== */
-
-.center-wrapper {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 80vh;
-}
-
-
-/* ===================================
-   RESPONSIVE
-=================================== */
-
-@media (max-width: 768px) {
-
-    .navbar {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
-    }
-
-    main {
-        margin: 20px auto;
-    }
-
-    .card {
-        padding: 25px;
-    }
+.sensor-box {
+    background: #fdfefe !important;
+    border: 1px solid var(--mint-light) !important;
+    border-radius: 15px !important;
 }
