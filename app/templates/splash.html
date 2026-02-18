@@ -2,31 +2,88 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Smart Water Monitoring | Oceanic Currents</title>
+    <title>Smart Water Monitoring</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+
     <style>
         body {
-            margin: 0; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center;
-            background: linear-gradient(135deg, #f0f7f4 0%, #d1f2eb 100%); font-family: 'Poppins', sans-serif; overflow: hidden;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(180deg, #0A3D62, #1ABC9C);
+            overflow: hidden;
+            font-family: 'Poppins', sans-serif;
         }
-        .hero { text-align: center; z-index: 5; }
-        .hero img { width: 140px; margin-bottom: 25px; }
-        .title { color: #154360; font-size: 32px; font-weight: 700; margin-bottom: 5px; }
-        .subtitle { color: #148F77; font-size: 16px; margin-bottom: 40px; }
-        .dive-btn {
-            background: #ffffff; color: #148F77; padding: 15px 50px; border-radius: 50px; font-weight: 600;
-            text-decoration: none; box-shadow: 0 10px 25px rgba(0,0,0,0.05); transition: 0.3s;
+
+        /* Soft water ripple effect */
+        body::before {
+            content: "";
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.08) 10%, transparent 40%);
+            animation: ripple 10s linear infinite;
         }
-        .dive-btn:hover { background: #148F77; color: white; transform: translateY(-3px); }
+
+        @keyframes ripple {
+            0% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.15) rotate(180deg); }
+            100% { transform: scale(1) rotate(360deg); }
+        }
+
+        .logo-container {
+            position: relative;
+            text-align: center;
+            cursor: pointer;
+            z-index: 2;
+            animation: fadeIn 1.2s ease-in-out;
+        }
+
+        .logo-container img {
+            width: 150px;
+            margin-bottom: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .logo-container:hover img {
+            transform: scale(1.08);
+        }
+
+        .title {
+            color: white;
+            font-size: 22px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .subtitle {
+            color: rgba(255,255,255,0.85);
+            font-size: 14px;
+            margin-top: 6px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
+
 <body>
-    <div class="hero">
-        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo">
-        <div class="title">OCEANIC CURRENTS</div>
-        <div class="subtitle">Smart Water Quality Monitoring System</div>
-        <a href="{{ url_for('main.login') }}" class="dive-btn">Dive In</a>
-    </div>
+
+<div class="logo-container" onclick="goToLogin()">
+    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo">
+    <div class="title">Smart Water Monitoring</div>
+    <div class="subtitle">IoT Based Water Quality System</div>
+</div>
+
+<script>
+    function goToLogin(){
+        window.location.href = "{{ url_for('main.login') }}";
+    }
+</script>
+
 </body>
 </html>
