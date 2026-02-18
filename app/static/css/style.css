@@ -1,90 +1,213 @@
 /* ===================================
-   ECO-FLUID (GEOMETRIC) CORE THEME
+   GLOBAL BACKGROUND
 =================================== */
-
-:root {
-    --mint-light: #D1F2EB;
-    --ocean-teal: #148F77;
-    --deep-blue: #154360;
-    --clean-white: #ffffff;
-    --bubble-bg: rgba(255, 255, 255, 0.95);
-}
 
 body {
     margin: 0;
     font-family: 'Poppins', sans-serif;
     min-height: 100vh;
-    background-color: #f0f7f4;
-    /* Geometric Low-Poly Background Pattern */
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cpath d='M0 100 L100 100 L100 0 Q50 50 0 0 Z' fill='%23d1f2eb' fill-opacity='0.4'/%3E%3C/svg%3E");
-    background-attachment: fixed;
-    color: var(--deep-blue);
+
+    background: linear-gradient(rgba(10,61,98,0.75), rgba(10,61,98,0.75)),
+                url("../images/water-bg.jpg") no-repeat center center fixed;
+
+    background-size: cover;
+    color: #0A3D62;
 }
 
-/* NAVBAR */
+
+/* ===================================
+   NAVBAR
+=================================== */
+
 .navbar {
-    background: var(--clean-white);
-    border-bottom: 3px solid var(--ocean-teal);
-    padding: 12px 18px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    background: linear-gradient(90deg, #0A3D62, #145374);
+    padding: 14px 28px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
 }
 
-.navbar-brand {
-    font-weight: 700 !important;
-    color: var(--deep-blue) !important;
+.navbar-left {
+    font-weight: 600;
+    font-size: 18px;
 }
 
-/* RUGGED BUBBLE BUTTONS */
-.btn-primary, .custom-btn, .btn-ocean, .btn-pond {
-    background: var(--ocean-teal) !important;
-    border: none !important;
-    border-radius: 30px !important;
-    padding: 10px 25px !important;
-    font-weight: 600 !important;
-    color: white !important;
+.navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.username {
+    font-size: 14px;
+}
+
+.logout-btn {
+    background: #1ABC9C;
+    border: none;
+    color: white;
+    padding: 6px 18px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 14px;
     transition: 0.3s ease;
-    box-shadow: 0 4px 10px rgba(20, 143, 119, 0.2);
 }
 
-.btn-primary:hover, .custom-btn:hover {
-    background: var(--deep-blue) !important;
-    transform: translateY(-2px);
+.logout-btn:hover {
+    background: #159c85;
 }
 
-/* CARDS & PANELS */
-.glass-card, .select-container, .register-card, .login-card {
-    background: var(--bubble-bg) !important;
-    backdrop-filter: blur(10px);
-    border-radius: 25px !important;
-    border: 1px solid rgba(255,255,255,0.3) !important;
-    box-shadow: 0 15px 35px rgba(21, 67, 96, 0.08) !important;
-    padding: 30px !important;
+
+/* ===================================
+   MAIN WRAPPER
+=================================== */
+
+main {
+    width: 95%;
+    max-width: 900px;
+    margin: 50px auto;
 }
 
-/* INPUTS & SENSORS */
-.form-control, .form-select {
-    border-radius: 12px !important;
-    border: 1.5px solid #E5E8E8 !important;
-    padding: 10px 15px !important;
+
+/* ===================================
+   CARD DESIGN
+=================================== */
+
+.card {
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(12px);
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    padding: 35px;
+    margin-bottom: 30px;
 }
 
-.sensor-box {
-    background: #ffffff;
-    border: 1.5px solid var(--mint-light);
-    border-radius: 15px;
-    padding: 15px;
-    transition: 0.3s;
+
+/* ===================================
+   LOGIN / REGISTER FORM CARD
+=================================== */
+
+.form-card {
+    max-width: 420px;
+    margin: 80px auto;
 }
 
-.sensor-box:hover {
-    border-color: var(--ocean-teal);
+h2 {
+    text-align: center;
+    font-weight: 600;
+    margin-bottom: 25px;
 }
 
-.sensor-box label {
-    display: block;
-    font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    color: var(--ocean-teal);
-    margin-bottom: 5px;
+
+/* ===================================
+   FORM ELEMENTS
+=================================== */
+
+.form-group {
+    margin-bottom: 18px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #d9e1ec;
+    border-radius: 8px;
+    background: #f9fbfd;
+    font-size: 14px;
+    transition: 0.2s ease;
+}
+
+.form-control:focus {
+    outline: none;
+    border: 1.5px solid #1ABC9C;
+    background: white;
+}
+
+
+/* ===================================
+   BUTTONS
+=================================== */
+
+.btn {
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: 0.3s ease;
+}
+
+.btn-primary {
+    background: #1ABC9C;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #159c85;
+}
+
+
+/* ===================================
+   FLASH MESSAGES
+=================================== */
+
+.flashes {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 20px;
+}
+
+.flash {
+    padding: 10px 15px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+.flash.success {
+    background: #E8F8F5;
+    color: #1ABC9C;
+    border-left: 4px solid #1ABC9C;
+}
+
+.flash.danger {
+    background: #FDEDEC;
+    color: #E74C3C;
+    border-left: 4px solid #E74C3C;
+}
+
+
+/* ===================================
+   CENTER WRAPPER (LOGIN FIX)
+=================================== */
+
+.center-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+}
+
+
+/* ===================================
+   RESPONSIVE
+=================================== */
+
+@media (max-width: 768px) {
+
+    .navbar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    main {
+        margin: 20px auto;
+    }
+
+    .card {
+        padding: 25px;
+    }
 }
