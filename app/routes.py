@@ -1,4 +1,5 @@
 import os
+import base64
 from datetime import datetime
 import pytz
 
@@ -13,8 +14,6 @@ from app.forms import LoginForm, RegistrationForm
 
 main = Blueprint("main", __name__)
 
-# --- Vercel Fix: Use /tmp for writable operations ---
-UPLOAD_FOLDER = "/tmp" 
 IST = pytz.timezone("Asia/Kolkata")
 
 
@@ -121,7 +120,7 @@ def logout():
 
 
 # =====================================================
-# SAVE DATA (FIXED FOR VERCEL & MATCHED TO MODELS.PY)
+# SAVE DATA (UPDATED: SAVES BASE64 TO DB)
 # =====================================================
 @main.route("/save_data", methods=["POST"])
 @login_required
@@ -147,20 +146,15 @@ def save_data():
         flash("Please select water type.", "danger")
         return redirect(url_for("main.dashboard"))
 
-    # Create writable directory in /tmp
-    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-
+    # --- IMAGE HANDLING: Convert to Base64 String ---
     image = request.files.get("image")
-    image_path = None
+    image_string = None
 
     if image and image.filename:
-        filename = secure_filename(image.filename)
-        timestamp_str = datetime.now().strftime("%Y%m%d%H%M%S")
-        filename = f"{timestamp_str}_{filename}"
-        
-        save_path = os.path.join(UPLOAD_FOLDER, filename)
-        image.save(save_path)
-        image_path = filename
+        # Read the file bytes
+        file_data = image.read()
+        # Convert to Base64 String
+        image_string = base64.b64encode(file_data).decode('utf-8')
 
     def to_float(value):
         try:
@@ -170,7 +164,7 @@ def save_data():
 
     current_time = datetime.now(IST)
 
-    # Creating database entry (Parameters match your updated models.py)
+    # Creating database entry
     entry = WaterData(
         user_id=current_user.id,
         latitude=to_float(data.get("latitude")),
@@ -181,7 +175,7 @@ def save_data():
         ph=to_float(data.get("ph")),
         tds=to_float(data.get("tds")),
         do=to_float(data.get("do")) if category == "pond" else None,
-        image_path=image_path,
+        image_path=image_string, # Saving the image string directly here
         timestamp=current_time
     )
 
