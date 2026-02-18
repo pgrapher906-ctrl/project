@@ -1,12 +1,11 @@
 {% extends 'base.html' %}
-{% block title %}Login | Smart Water Monitoring{% endblock %}
+{% block title %}System Access | Login{% endblock %}
 
 {% block content %}
 <style>
 /* =========================================
    ECO-FLUID LOGIN DESIGN
 ========================================= */
-
 .login-wrapper {
     min-height: 80vh;
     display: flex;
@@ -18,12 +17,6 @@
 .login-card {
     width: 100%;
     max-width: 420px;
-    background: rgba(255, 255, 255, 0.95) !important;
-    backdrop-filter: blur(10px);
-    border-radius: 30px !important;
-    border: 1px solid rgba(255, 255, 255, 0.3) !important;
-    box-shadow: 0 20px 45px rgba(21, 67, 96, 0.1) !important;
-    padding: 40px !important;
 }
 
 .login-card h2 {
@@ -31,27 +24,14 @@
     text-align: center;
     margin-bottom: 30px;
     color: #154360;
-    letter-spacing: -0.5px;
 }
 
 .form-label {
     font-weight: 600;
     color: #148F77;
     font-size: 0.85rem;
-    margin-bottom: 8px;
     text-transform: uppercase;
-}
-
-.form-control {
-    border-radius: 12px !important;
-    padding: 12px !important;
-    border: 1.5px solid #E5E8E8 !important;
-    transition: 0.3s ease;
-}
-
-.form-control:focus {
-    border-color: #148F77 !important;
-    box-shadow: 0 0 0 0.2rem rgba(20, 143, 119, 0.1) !important;
+    margin-bottom: 8px;
 }
 
 .login-footer {
@@ -66,15 +46,11 @@
     font-weight: 600;
     text-decoration: none;
 }
-
-.login-footer a:hover {
-    text-decoration: underline;
-}
 </style>
 
 <div class="login-wrapper">
-    <div class="login-card">
-        <h2>Welcome Back</h2>
+    <div class="glass-card login-card">
+        <h2>System Access</h2>
 
         <form method="POST">
             {{ form.hidden_tag() }}
@@ -97,8 +73,9 @@
             <button type="submit" class="btn-primary w-100 py-3">Initialize Login</button>
 
             <div class="login-footer">
-                Need system access? 
-                <a href="{{ url_for('main.register') }}">Create Profile</a>
+                Unauthorized access is prohibited_ 
+                <br>
+                <a href="{{ url_for('main.register') }}">Request New Enrollment</a>
             </div>
         </form>
     </div>
