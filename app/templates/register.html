@@ -1,12 +1,11 @@
 {% extends 'base.html' %}
-{% block title %}Register | Smart Water Monitoring{% endblock %}
+{% block title %}System Enrollment | Register{% endblock %}
 
 {% block content %}
 <style>
 /* =========================================
    ECO-FLUID REGISTER DESIGN
 ========================================= */
-
 .register-wrapper {
     min-height: 85vh;
     display: flex;
@@ -18,12 +17,6 @@
 .register-card {
     width: 100%;
     max-width: 480px;
-    background: rgba(255, 255, 255, 0.95) !important;
-    backdrop-filter: blur(10px);
-    border-radius: 30px !important;
-    border: 1px solid rgba(255, 255, 255, 0.3) !important;
-    box-shadow: 0 20px 45px rgba(21, 67, 96, 0.1) !important;
-    padding: 40px !important;
 }
 
 .register-card h2 {
@@ -38,11 +31,6 @@
     color: #148F77;
     font-size: 0.85rem;
     text-transform: uppercase;
-}
-
-.form-control {
-    border-radius: 12px !important;
-    padding: 10px 15px !important;
 }
 
 .register-footer {
@@ -60,15 +48,15 @@
 </style>
 
 <div class="register-wrapper">
-    <div class="register-card">
-        <h2>System Enrollment</h2>
+    <div class="glass-card register-card">
+        <h2>New User Enrollment</h2>
 
         <form method="POST">
             {{ form.hidden_tag() }}
 
             <div class="mb-3">
-                <label class="form-label">Operator Name</label>
-                {{ form.username(class="form-control", placeholder="Display name") }}
+                <label class="form-label">System Username</label>
+                {{ form.username(class="form-control", placeholder="e.g. Operator_01") }}
             </div>
 
             <div class="mb-3">
@@ -82,14 +70,15 @@
             </div>
 
             <div class="mb-4">
-                <label class="form-label">Verify Key</label>
+                <label class="form-label">Confirm Security Key</label>
                 {{ form.confirm_password(class="form-control", placeholder="Repeat security key") }}
             </div>
 
             <button type="submit" class="btn-primary w-100 py-3">Generate Credentials</button>
 
             <div class="register-footer">
-                Already registered? 
+                Already registered in the system? 
+                <br>
                 <a href="{{ url_for('main.login') }}">Return to Login</a>
             </div>
         </form>
