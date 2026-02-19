@@ -15,10 +15,25 @@ main = Blueprint("main", __name__)
 IST = pytz.timezone("Asia/Kolkata")
 
 # =====================================================
-# SPLASH SCREEN
+# SPLASH SCREEN (WITH AUTO-REPAIR)
 # =====================================================
 @main.route("/")
 def splash():
+    # AUTO-FIX: Attempt to fix DB columns every time splash is loaded
+    try:
+        # Check if the database is healthy
+        User.query.limit(1).all()
+    except Exception:
+        db.session.rollback()
+        try:
+            with db.engine.connect() as conn:
+                conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS visit_count INTEGER DEFAULT 0;"))
+                conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS last_login TIMESTAMP WITH TIME ZONE;"))
+                conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW();"))
+                conn.commit()
+        except Exception:
+            pass # Silent failure if DB is unreachable
+            
     return render_template("splash.html")
 
 # =====================================================
@@ -32,7 +47,6 @@ def register():
             flash("Email already registered.", "danger")
             return redirect(url_for("main.register"))
 
-        # Generate Hash
         hashed_pw = bcrypt.generate_password_hash(form.password.data).decode("utf-8")
         
         new_user = User(
@@ -50,39 +64,38 @@ def register():
     return render_template("register.html", form=form)
 
 # =====================================================
-# LOGIN (CRASH PROOF VERSION)
+# LOGIN (CRASH PROOF & AUTO-REPAIR)
 # =====================================================
 @main.route("/login", methods=["GET", "POST"])
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
-        
-        # 1. Check Password safely (Catches 'Invalid Salt' error)
-        password_matches = False
         try:
+            user = User.query.filter_by(email=form.email.data).first()
+            
+            # 1. Check Password safely (Catches 'Invalid Salt' or 'Missing Column' error)
             if user and bcrypt.check_password_hash(user.password_hash, form.password.data):
-                password_matches = True
-        except ValueError:
-            # If the database hash is bad, we catch the error here!
-            flash("Account corrupted (Invalid Salt). Please delete user and re-register.", "danger")
-            return render_template("login.html", form=form)
-
-        # 2. If password is correct, Log In
-        if password_matches:
-            login_user(user)
+                login_user(user)
+                
+                # 2. Update Metrics Safely
+                try:
+                    user.visit_count = (user.visit_count or 0) + 1
+                    user.last_login = datetime.now(IST)
+                    db.session.commit()
+                except Exception:
+                    db.session.rollback() # Ignore update error, prioritize login
+                
+                return redirect(url_for("main.select_water"))
             
-            # 3. Update Metrics Safely (Catches Timestamp error)
-            try:
-                user.visit_count = (user.visit_count or 0) + 1
-                user.last_login = datetime.now(IST)
-                db.session.commit()
-            except Exception:
-                db.session.rollback() # Ignore update error, keep user logged in
+            flash("Invalid email or password.", "danger")
             
-            return redirect(url_for("main.select_water"))
-        
-        flash("Invalid email or password.", "danger")
+        except Exception as e:
+            db.session.rollback()
+            # If the error is a missing column, try to fix it right here
+            if "last_login" in str(e) or "created_at" in str(e):
+                return redirect(url_for("main.fix_my_db"))
+            flash("An unexpected error occurred. Please try again.", "danger")
+            
     return render_template("login.html", form=form)
 
 # =====================================================
@@ -129,23 +142,27 @@ def save_data():
     if image:
         image_string = base64.b64encode(image.read()).decode('utf-8')
 
-    # Create Database Entry
-    entry = WaterData(
-        user_id=current_user.id,
-        latitude=float(data.get("latitude")),
-        longitude=float(data.get("longitude")),
-        water_type=data.get("water_type"),
-        pin_id=data.get("pin_id"),
-        temperature=float(data.get("temperature")) if data.get("temperature") else None,
-        ph=float(data.get("ph")) if data.get("ph") else None,
-        tds=float(data.get("tds")) if data.get("tds") else None,
-        do=float(data.get("do")) if category == "pond" else None,
-        image_path=image_string
-    )
-    
-    db.session.add(entry)
-    db.session.commit()
-    flash("Data saved successfully!", "success")
+    try:
+        entry = WaterData(
+            user_id=current_user.id,
+            latitude=float(data.get("latitude")),
+            longitude=float(data.get("longitude")),
+            water_type=data.get("water_type"),
+            pin_id=data.get("pin_id"),
+            temperature=float(data.get("temperature")) if data.get("temperature") else None,
+            ph=float(data.get("ph")) if data.get("ph") else None,
+            tds=float(data.get("tds")) if data.get("tds") else None,
+            do=float(data.get("do")) if category == "pond" else None,
+            image_path=image_string
+        )
+        
+        db.session.add(entry)
+        db.session.commit()
+        flash("Data saved successfully!", "success")
+    except Exception as e:
+        db.session.rollback()
+        flash(f"Error saving data: {str(e)}", "danger")
+
     return redirect(url_for("main.dashboard"))
 
 # =====================================================
@@ -168,6 +185,7 @@ def fix_my_db():
             conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS last_login TIMESTAMP WITH TIME ZONE;"))
             conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW();"))
             conn.commit()
-        return "✅ SUCCESS! Database columns fixed."
+        flash("Database columns fixed successfully!", "success")
+        return redirect(url_for("main.login"))
     except Exception as e:
         return f"❌ Error fixing database: {e}"
