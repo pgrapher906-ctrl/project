@@ -34,8 +34,6 @@ def register():
 
         hashed_pw = bcrypt.generate_password_hash(form.password.data).decode("utf-8")
         
-        # We don't need to pass created_at here if the DB has a default,
-        # but passing it explicitly ensures it's set correctly in Python.
         new_user = User(
             username=form.username.data, 
             email=form.email.data, 
@@ -51,22 +49,32 @@ def register():
     return render_template("register.html", form=form)
 
 # =====================================================
-# LOGIN
+# LOGIN (UPDATED: SAFE MODE)
 # =====================================================
 @main.route("/login", methods=["GET", "POST"])
 def login():
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
+        
         if user and bcrypt.check_password_hash(user.password_hash, form.password.data):
-            # Update login metrics
-            user.visit_count = (user.visit_count or 0) + 1
-            user.last_login = datetime.now(IST)
-            db.session.commit()
-            
+            # 1. Log the user in FIRST (Critical Step)
+            # This sets the session cookie so you are logged in even if the DB update below fails.
             login_user(user)
+            
+            # 2. Try to update activity safely (Prevents 500 Crash)
+            try:
+                user.visit_count = (user.visit_count or 0) + 1
+                user.last_login = datetime.now(IST)
+                db.session.commit()
+            except Exception as e:
+                # If DB update fails, rollback the transaction but KEEP user logged in.
+                db.session.rollback()
+                print(f"Warning: Could not update usage stats: {e}")
+            
             return redirect(url_for("main.select_water"))
-        flash("Invalid credentials.", "danger")
+        
+        flash("Invalid email or password.", "danger")
     return render_template("login.html", form=form)
 
 # =====================================================
@@ -158,7 +166,7 @@ def fix_my_db():
             # 2. Add last_login
             conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS last_login TIMESTAMP WITH TIME ZONE;"))
             
-            # 3. Add created_at (This fixes the specific error you saw!)
+            # 3. Add created_at
             conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW();"))
             
             conn.commit()
