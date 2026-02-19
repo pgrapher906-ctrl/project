@@ -32,6 +32,7 @@ def register():
             flash("Email already registered.", "danger")
             return redirect(url_for("main.register"))
 
+        # Generate Hash
         hashed_pw = bcrypt.generate_password_hash(form.password.data).decode("utf-8")
         
         new_user = User(
@@ -49,7 +50,7 @@ def register():
     return render_template("register.html", form=form)
 
 # =====================================================
-# LOGIN (UPDATED: SAFE MODE)
+# LOGIN (CRASH PROOF VERSION)
 # =====================================================
 @main.route("/login", methods=["GET", "POST"])
 def login():
@@ -57,20 +58,27 @@ def login():
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         
-        if user and bcrypt.check_password_hash(user.password_hash, form.password.data):
-            # 1. Log the user in FIRST (Critical Step)
-            # This sets the session cookie so you are logged in even if the DB update below fails.
+        # 1. Check Password safely (Catches 'Invalid Salt' error)
+        password_matches = False
+        try:
+            if user and bcrypt.check_password_hash(user.password_hash, form.password.data):
+                password_matches = True
+        except ValueError:
+            # If the database hash is bad, we catch the error here!
+            flash("Account corrupted (Invalid Salt). Please delete user and re-register.", "danger")
+            return render_template("login.html", form=form)
+
+        # 2. If password is correct, Log In
+        if password_matches:
             login_user(user)
             
-            # 2. Try to update activity safely (Prevents 500 Crash)
+            # 3. Update Metrics Safely (Catches Timestamp error)
             try:
                 user.visit_count = (user.visit_count or 0) + 1
                 user.last_login = datetime.now(IST)
                 db.session.commit()
-            except Exception as e:
-                # If DB update fails, rollback the transaction but KEEP user logged in.
-                db.session.rollback()
-                print(f"Warning: Could not update usage stats: {e}")
+            except Exception:
+                db.session.rollback() # Ignore update error, keep user logged in
             
             return redirect(url_for("main.select_water"))
         
@@ -150,27 +158,16 @@ def logout():
     return redirect(url_for("main.login"))
 
 # =====================================================
-# 🛠️ CRITICAL DATABASE FIX ROUTE
+# 🛠️ DATABASE FIX ROUTE
 # =====================================================
 @main.route("/fix_my_db")
 def fix_my_db():
-    """
-    Run this URL once to fix 'UndefinedColumn' errors.
-    It manually adds visit_count, last_login, and created_at to the database.
-    """
     try:
         with db.engine.connect() as conn:
-            # 1. Add visit_count
             conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS visit_count INTEGER DEFAULT 0;"))
-            
-            # 2. Add last_login
             conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS last_login TIMESTAMP WITH TIME ZONE;"))
-            
-            # 3. Add created_at
             conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW();"))
-            
             conn.commit()
-            
-        return "✅ SUCCESS! Database columns 'visit_count', 'last_login', and 'created_at' have been added. You can now Login!"
+        return "✅ SUCCESS! Database columns fixed."
     except Exception as e:
         return f"❌ Error fixing database: {e}"
