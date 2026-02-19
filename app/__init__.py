@@ -49,6 +49,11 @@ def create_app():
 
         @login_manager.user_loader
         def load_user(user_id):
-            return db.session.get(User, int(user_id))
+            # FIXED: Wrapped in try/except to prevent global crash if DB columns are missing
+            try:
+                return db.session.get(User, int(user_id))
+            except Exception:
+                db.session.rollback()
+                return None
 
     return app
