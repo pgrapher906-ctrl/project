@@ -19,7 +19,6 @@ IST = pytz.timezone("Asia/Kolkata")
 # =====================================================
 @main.route("/")
 def splash():
-    # AUTO-FIX: Attempt to fix DB columns every time splash is loaded
     try:
         # Check if the database is healthy
         User.query.limit(1).all()
@@ -32,7 +31,7 @@ def splash():
                 conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW();"))
                 conn.commit()
         except Exception:
-            pass # Silent failure if DB is unreachable
+            pass 
             
     return render_template("splash.html")
 
@@ -64,7 +63,7 @@ def register():
     return render_template("register.html", form=form)
 
 # =====================================================
-# LOGIN (CRASH PROOF & AUTO-REPAIR)
+# LOGIN (CRASH PROOF)
 # =====================================================
 @main.route("/login", methods=["GET", "POST"])
 def login():
@@ -73,17 +72,15 @@ def login():
         try:
             user = User.query.filter_by(email=form.email.data).first()
             
-            # 1. Check Password safely (Catches 'Invalid Salt' or 'Missing Column' error)
             if user and bcrypt.check_password_hash(user.password_hash, form.password.data):
                 login_user(user)
                 
-                # 2. Update Metrics Safely
                 try:
                     user.visit_count = (user.visit_count or 0) + 1
                     user.last_login = datetime.now(IST)
                     db.session.commit()
                 except Exception:
-                    db.session.rollback() # Ignore update error, prioritize login
+                    db.session.rollback() 
                 
                 return redirect(url_for("main.select_water"))
             
@@ -91,7 +88,7 @@ def login():
             
         except Exception as e:
             db.session.rollback()
-            # If the error is a missing column, try to fix it right here
+            # If columns are missing, redirect to fix
             if "last_login" in str(e) or "created_at" in str(e):
                 return redirect(url_for("main.fix_my_db"))
             flash("An unexpected error occurred. Please try again.", "danger")
@@ -136,7 +133,6 @@ def save_data():
     category = session.get("water_category")
     data = request.form
     
-    # Image Processing
     image = request.files.get("image")
     image_string = None
     if image:
@@ -175,7 +171,24 @@ def logout():
     return redirect(url_for("main.login"))
 
 # =====================================================
-# 🛠️ DATABASE FIX ROUTE
+# 🛠️ NUCLEAR RESET (USE THIS TO CLEAR ALL DATA)
+# =====================================================
+@main.route("/nuclear_reset")
+def nuclear_reset():
+    """Drops all tables and recreates them fresh."""
+    try:
+        db.session.execute(text("DROP TABLE IF EXISTS water_data CASCADE;"))
+        db.session.execute(text("DROP TABLE IF EXISTS users CASCADE;"))
+        db.session.commit()
+        
+        db.create_all()
+        return "☢️ DATABASE RESET SUCCESSFUL! All data cleared and tables recreated. Go to /register now."
+    except Exception as e:
+        db.session.rollback()
+        return f"❌ Reset failed: {e}"
+
+# =====================================================
+# 🛠️ MANUAL FIX ROUTE
 # =====================================================
 @main.route("/fix_my_db")
 def fix_my_db():
