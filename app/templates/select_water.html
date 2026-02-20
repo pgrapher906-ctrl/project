@@ -14,7 +14,6 @@
     justify-content: center;
     padding: 20px;
     position: relative;
-    /* Removed the full-page animation */
 }
 
 /* =========================================
@@ -40,7 +39,7 @@
 }
 
 /* =========================================
-   WATER CARDS (The Clickboxes)
+   STATIC WATER CARDS
 ========================================= */
 .water-card {
     border-radius: 20px;
@@ -55,87 +54,35 @@
     box-shadow: 0 20px 45px rgba(0,0,0,0.12);
 }
 
-/* Preview Box - Strictly Contains Animation */
 .water-preview {
     height: 170px;
     border-radius: 16px;
     margin-bottom: 18px;
     background-size: cover;
     background-position: center;
-    position: relative;
-    overflow: hidden; /* This locks the animation strictly inside the box */
-    box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
 }
 
-/* =========================================
-   ANIMATIONS (Strictly inside preview box)
-========================================= */
-.wave-layer {
-    position: absolute;
-    bottom: -15px;
-    left: 0;
-    width: 200%;
-    height: 50px;
-    background: rgba(255, 255, 255, 0.3);
-    border-radius: 40%;
-    animation: waveBoxAnim 4s infinite linear;
-    z-index: 1;
-}
-
-.wave-layer.two {
-    bottom: -25px;
-    background: rgba(255, 255, 255, 0.5);
-    animation: waveBoxAnim 5s infinite linear reverse;
-    z-index: 2;
-}
-
-.swim-fish {
-    position: absolute;
-    top: 40%;
-    left: -40px;
-    font-size: 26px;
-    animation: swimBoxAnim 6s infinite linear;
-    z-index: 3;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-}
-
-.swim-fish.delay {
-    top: 65%;
-    font-size: 18px;
-    animation: swimBoxAnim 5s infinite linear 2.5s; /* Delays the second fish */
-}
-
-@keyframes waveBoxAnim {
-    0% { transform: translateX(0) translateY(0); }
-    50% { transform: translateX(-25%) translateY(8px); }
-    100% { transform: translateX(-50%) translateY(0); }
-}
-
-@keyframes swimBoxAnim {
-    0% { transform: translateX(-40px) translateY(0); }
-    25% { transform: translateX(80px) translateY(-15px); }
-    50% { transform: translateX(200px) translateY(5px); }
-    75% { transform: translateX(320px) translateY(-10px); }
-    100% { transform: translateX(450px) translateY(0); }
-}
-
-/* =========================================
-   BUTTONS & TEXT
-========================================= */
 .water-title {
     font-weight: 600;
     font-size: 16px;
     margin-bottom: 15px;
 }
 
+/* =========================================
+   ANIMATED BUTTONS (The "Click Boxes")
+========================================= */
 .btn-ocean, .btn-pond {
     width: 100%;
-    padding: 11px;
+    padding: 14px;
     border-radius: 12px;
     border: none;
-    font-weight: 500;
     color: white;
     transition: 0.3s ease;
+    position: relative;
+    overflow: hidden; /* This traps the fish/waves INSIDE the button */
+    cursor: pointer;
+    display: block;
 }
 
 .btn-ocean { background: linear-gradient(90deg, #0A3D62, #1ABC9C); }
@@ -143,7 +90,66 @@
 
 .btn-ocean:hover, .btn-pond:hover {
     transform: translateY(-2px);
-    opacity: 0.95;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}
+
+/* Keeps the text readable and above the water */
+.btn-text {
+    position: relative;
+    z-index: 10;
+    font-weight: 600;
+    font-size: 16px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5); 
+}
+
+/* Button Wave Animations */
+.btn-wave {
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 200%;
+    height: 30px; 
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 40%;
+    animation: btnWaveAnim 3s infinite linear;
+    z-index: 1;
+}
+
+.btn-wave.two {
+    bottom: -10px;
+    background: rgba(255, 255, 255, 0.35);
+    animation: btnWaveAnim 4s infinite linear reverse;
+    z-index: 2;
+}
+
+/* Button Fish Animations */
+.btn-fish {
+    position: absolute;
+    top: 25%;
+    left: -30px;
+    font-size: 16px; /* Sized for the button */
+    animation: btnSwimAnim 5s infinite linear;
+    z-index: 3;
+}
+
+.btn-fish.delay {
+    top: 45%;
+    font-size: 12px;
+    animation: btnSwimAnim 4s infinite linear 2.5s; /* Delays the second fish */
+}
+
+@keyframes btnWaveAnim {
+    0% { transform: translateX(0) translateY(0); }
+    50% { transform: translateX(-25%) translateY(4px); }
+    100% { transform: translateX(-50%) translateY(0); }
+}
+
+@keyframes btnSwimAnim {
+    0% { transform: translateX(-30px) translateY(0); }
+    25% { transform: translateX(80px) translateY(-5px); }
+    50% { transform: translateX(200px) translateY(5px); }
+    75% { transform: translateX(350px) translateY(-3px); }
+    100% { transform: translateX(500px) translateY(0); }
 }
 
 @media (max-width: 768px) {
@@ -166,10 +172,6 @@
                 <div class="water-card text-center">
                     
                     <div class="water-preview" style="background-image: url('{{ url_for('static', filename='images/ocean.jpg') }}');">
-                        <div class="swim-fish">🦈</div>
-                        <div class="swim-fish delay">🐟</div>
-                        <div class="wave-layer"></div>
-                        <div class="wave-layer two"></div>
                     </div>
 
                     <h5 class="water-title text-primary">
@@ -179,7 +181,11 @@
                     <form method="POST" action="{{ url_for('main.select_water') }}">
                         <input type="hidden" name="water_type" value="ocean">
                         <button type="submit" class="btn-ocean">
-                            Enter Ocean Monitoring
+                            <span class="btn-text">Enter Ocean Monitoring</span>
+                            <div class="btn-fish">🦈</div>
+                            <div class="btn-fish delay">🐟</div>
+                            <div class="btn-wave"></div>
+                            <div class="btn-wave two"></div>
                         </button>
                     </form>
 
@@ -190,10 +196,6 @@
                 <div class="water-card text-center">
 
                     <div class="water-preview" style="background-image: url('{{ url_for('static', filename='images/pond.jpg') }}');">
-                        <div class="swim-fish">🐠</div>
-                        <div class="swim-fish delay">🐸</div>
-                        <div class="wave-layer"></div>
-                        <div class="wave-layer two"></div>
                     </div>
 
                     <h5 class="water-title text-success">
@@ -203,7 +205,11 @@
                     <form method="POST" action="{{ url_for('main.select_water') }}">
                         <input type="hidden" name="water_type" value="pond">
                         <button type="submit" class="btn-pond">
-                            Enter Pond Monitoring
+                            <span class="btn-text">Enter Pond Monitoring</span>
+                            <div class="btn-fish">🐠</div>
+                            <div class="btn-fish delay">🐸</div>
+                            <div class="btn-wave"></div>
+                            <div class="btn-wave two"></div>
                         </button>
                     </form>
 
