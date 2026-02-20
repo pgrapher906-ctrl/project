@@ -7,11 +7,13 @@
 <style>
 
 /* ==============================
-   CLEAN MOBILE SCIENTIFIC UI
+   CLEAN MOBILE SCIENTIFIC UI WITH CUSTOM BACKGROUND
 ============================== */
 
 body {
-    background: #F4F6F9;
+    /* Set the new 3rd image as the background */
+    background: url("{{ url_for('static', filename='images/wave_bg.jpg') }}") no-repeat center center fixed !important;
+    background-size: cover !important;
 }
 
 .dashboard-wrapper {
@@ -21,10 +23,12 @@ body {
 }
 
 .glass-card {
-    background: white;
+    /* Made slightly more transparent to show the background */
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(12px);
     padding: 25px;
     border-radius: 18px;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.15);
 }
 
 .section-title {
@@ -66,7 +70,7 @@ body {
 }
 
 .sensor-box {
-    background: #F8FBFD;
+    background: rgba(248, 251, 253, 0.9);
     padding: 15px;
     border-radius: 12px;
     border: 1px solid #e4eef5;
@@ -86,11 +90,10 @@ body {
 <div class="dashboard-wrapper">
 <div class="glass-card">
 
-<h4 class="mb-4 fw-semibold">Water Quality Data Entry</h4>
+<h4 class="mb-4 fw-semibold text-center" style="color: #0A3D62;">Water Quality Data Entry</h4>
 
 <form method="POST" action="{{ url_for('main.save_data') }}" enctype="multipart/form-data">
 
-<!-- ================= STEP 1 ================= -->
 <div class="section-title">Step 1 – Detect Location</div>
 
 <button type="button" class="custom-btn mb-3" onclick="getLocation()">Detect Location</button>
@@ -106,23 +109,19 @@ body {
 
 <div id="map"></div>
 
-<!-- ================= STEP 2 ================= -->
 <div class="section-title">Step 2 – Water Type</div>
 
 <select class="form-select mb-3" id="waterType" name="water_type" required>
     <option value="">Select Water Type</option>
 </select>
 
-<!-- ================= STEP 3 ================= -->
 <div class="section-title">Step 3 – Pin ID</div>
 <input type="text" name="pin_id" class="form-control mb-3" placeholder="Enter Pin ID" required>
 
-<!-- ================= STEP 4 ================= -->
 <div class="section-title">Step 4 – Bluetooth</div>
 <button type="button" class="custom-btn mb-2" onclick="scanBLE()">Scan BLE Devices</button>
 <p>Status: <span id="bleStatus" class="status-disconnected">Not Connected</span></p>
 
-<!-- ================= STEP 5 ================= -->
 <div class="section-title">Step 5 – Sensor Data</div>
 <button type="button" class="custom-btn mb-3" onclick="readSensor()">Read Sensor Data</button>
 
@@ -144,7 +143,6 @@ body {
     </div>
 </div>
 
-<!-- POND SENSORS -->
 <div id="pondSensors" class="row g-3 mt-3" style="display:none;">
     <div class="col-md-4">
         <div class="sensor-box">
@@ -153,7 +151,6 @@ body {
     </div>
 </div>
 
-<!-- ================= STEP 6 ================= -->
 <div class="section-title">Step 6 – Upload Image</div>
 <input type="file" name="image" class="form-control mb-3">
 
