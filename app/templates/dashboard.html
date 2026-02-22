@@ -11,7 +11,7 @@
 body {
     background: url("{{ url_for('static', filename='images/wave_bg.jpg') }}") no-repeat center center fixed !important;
     background-size: cover !important;
-    overflow-x: hidden; /* Fixes horizontal scroll issue on mobile */
+    overflow-x: hidden !important; /* Forces no horizontal scrolling */
 }
 
 .dashboard-wrapper {
@@ -75,16 +75,14 @@ body {
 }
 
 /* ===================================
-   DASHBOARD RESPONSIVE FIXES
+   DASHBOARD RESPONSIVE FIXES (Centered perfectly)
 =================================== */
 @media (max-width: 768px) {
     .dashboard-wrapper {
-        padding: 10px;
+        padding: 0 10px; /* Reduced side padding */
         margin: 15px auto;
-        width: 100vw;
-        max-width: 100%;
+        width: 100%; /* FIX: Prevents breaking out of the container */
         box-sizing: border-box;
-        overflow-x: hidden;
     }
     
     .glass-card {
@@ -93,7 +91,7 @@ body {
         box-sizing: border-box;
     }
 
-    /* Override bootstrap row margins to prevent screen stretching */
+    /* Stop rows from stretching the screen */
     .row {
         margin-left: 0 !important;
         margin-right: 0 !important;
@@ -104,7 +102,7 @@ body {
         padding-right: 5px !important;
     }
 
-    /* Stack the row items perfectly on mobile */
+    /* Stack the row items */
     .row.g-3 > .col-md-6,
     .row.g-3 > .col-md-4 {
         width: 100%;
