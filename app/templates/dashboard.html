@@ -6,62 +6,30 @@
 
 <style>
 /* ==============================
-   ANIMATED OCEAN BACKGROUND UI
+   CLEAN UI WITH ORIGINAL BACKGROUND
+   (Applying Mockup Styles to Elements Only)
 ============================== */
 body {
-    /* Flowing Animated Gradient */
-    background: linear-gradient(-45deg, #0A3D62, #0e8388, #1ABC9C, #145374);
-    background-size: 400% 400%;
-    animation: oceanFlow 15s ease infinite;
-    
+    /* Kept your original wave background untouched! */
+    background: url("{{ url_for('static', filename='images/wave_bg.jpg') }}") no-repeat center center fixed !important;
+    background-size: cover !important;
     overflow-x: hidden !important; 
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    position: relative;
-    z-index: 0;
 }
 
-/* Subtle moving underwater sunlight rays */
-body::before {
-    content: '';
-    position: fixed;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 50%);
-    animation: spinRays 25s linear infinite;
-    z-index: -1;
-    pointer-events: none;
-}
-
-/* Animation Keyframes */
-@keyframes oceanFlow {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-}
-
-@keyframes spinRays {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-/* ==============================
-   MOCKUP STYLED ELEMENTS
-============================== */
 .dashboard-wrapper {
     max-width: 950px;
     margin: 40px auto;
     padding: 20px;
 }
 
-/* Very rounded, highly frosted glass card */
+/* Very rounded, highly frosted glass card matching the mockup */
 .glass-card {
     background: rgba(255, 255, 255, 0.45);
     backdrop-filter: blur(25px);
     -webkit-backdrop-filter: blur(25px);
     padding: 35px;
-    border-radius: 40px; 
+    border-radius: 40px; /* Highly rounded corners */
     border: 1px solid rgba(255, 255, 255, 0.8);
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
 }
@@ -82,7 +50,7 @@ body::before {
     color: white;
     border: none;
     padding: 12px 24px;
-    border-radius: 30px; 
+    border-radius: 30px; /* Pill shape */
     transition: all 0.3s ease;
     font-weight: 600;
     box-shadow: 0 6px 15px rgba(26, 188, 156, 0.3);
@@ -102,25 +70,24 @@ body::before {
     border-radius: 20px !important;
     border: 1px solid rgba(255, 255, 255, 0.9) !important;
     padding: 12px 20px !important;
-    background: rgba(255, 255, 255, 0.95) !important;
+    background: rgba(255, 255, 255, 0.9) !important;
     box-shadow: inset 0 2px 5px rgba(0,0,0,0.02) !important;
     font-size: 14px;
     color: #333;
 }
 
 .form-control:focus, .form-select:focus {
-    box-shadow: 0 0 0 3px rgba(26, 188, 156, 0.4) !important;
+    box-shadow: 0 0 0 3px rgba(26, 188, 156, 0.3) !important;
     outline: none !important;
 }
 
 #map {
     height: 280px;
-    border-radius: 20px; 
+    border-radius: 20px; /* Matched map roundness */
     margin-top: 15px;
     display: none;
     width: 100%;
     border: 3px solid white;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
 }
 
 .status-connected {
@@ -134,15 +101,14 @@ body::before {
 }
 
 .sensor-box {
-    background: rgba(255, 255, 255, 0.7);
+    background: rgba(255, 255, 255, 0.6);
     padding: 10px;
     border-radius: 25px;
-    border: 1px solid rgba(255, 255, 255, 0.9);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+    border: 1px solid rgba(255, 255, 255, 0.8);
 }
 
 /* ===================================
-   DASHBOARD RESPONSIVE FIXES
+   DASHBOARD RESPONSIVE FIXES (Untouched)
 =================================== */
 @media (max-width: 768px) {
     .dashboard-wrapper {
