@@ -11,6 +11,7 @@
 body {
     background: url("{{ url_for('static', filename='images/wave_bg.jpg') }}") no-repeat center center fixed !important;
     background-size: cover !important;
+    overflow-x: hidden; /* Fixes horizontal scroll issue on mobile */
 }
 
 .dashboard-wrapper {
@@ -80,10 +81,27 @@ body {
     .dashboard-wrapper {
         padding: 10px;
         margin: 15px auto;
+        width: 100vw;
+        max-width: 100%;
+        box-sizing: border-box;
+        overflow-x: hidden;
     }
     
     .glass-card {
-        padding: 20px;
+        padding: 20px 15px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* Override bootstrap row margins to prevent screen stretching */
+    .row {
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+    
+    .row > * {
+        padding-left: 5px !important;
+        padding-right: 5px !important;
     }
 
     /* Stack the row items perfectly on mobile */
