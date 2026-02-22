@@ -5,13 +5,10 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
 
 <style>
-
 /* ==============================
    CLEAN MOBILE SCIENTIFIC UI WITH CUSTOM BACKGROUND
 ============================== */
-
 body {
-    /* Set the new 3rd image as the background */
     background: url("{{ url_for('static', filename='images/wave_bg.jpg') }}") no-repeat center center fixed !important;
     background-size: cover !important;
 }
@@ -23,7 +20,6 @@ body {
 }
 
 .glass-card {
-    /* Made slightly more transparent to show the background */
     background: rgba(255, 255, 255, 0.88);
     backdrop-filter: blur(12px);
     padding: 25px;
@@ -57,6 +53,7 @@ body {
     border-radius: 12px;
     margin-top: 15px;
     display: none;
+    width: 100%;
 }
 
 .status-connected {
@@ -76,17 +73,35 @@ body {
     border: 1px solid #e4eef5;
 }
 
+/* ===================================
+   DASHBOARD RESPONSIVE FIXES
+=================================== */
 @media (max-width: 768px) {
     .dashboard-wrapper {
         padding: 10px;
+        margin: 15px auto;
+    }
+    
+    .glass-card {
+        padding: 20px;
+    }
+
+    /* Stack the row items perfectly on mobile */
+    .row.g-3 > .col-md-6,
+    .row.g-3 > .col-md-4 {
+        width: 100%;
+        margin-top: 10px;
+    }
+
+    .custom-btn {
+        width: 100%;
+        margin-bottom: 10px;
     }
 }
-
 </style>
 {% endblock %}
 
 {% block content %}
-
 <div class="dashboard-wrapper">
 <div class="glass-card">
 
@@ -95,7 +110,6 @@ body {
 <form method="POST" action="{{ url_for('main.save_data') }}" enctype="multipart/form-data">
 
 <div class="section-title">Step 1 – Detect Location</div>
-
 <button type="button" class="custom-btn mb-3" onclick="getLocation()">Detect Location</button>
 
 <div class="row g-3">
@@ -110,7 +124,6 @@ body {
 <div id="map"></div>
 
 <div class="section-title">Step 2 – Water Type</div>
-
 <select class="form-select mb-3" id="waterType" name="water_type" required>
     <option value="">Select Water Type</option>
 </select>
@@ -159,12 +172,10 @@ body {
 </form>
 </div>
 </div>
-
 {% endblock %}
 
 {% block scripts %}
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-
 <script>
 let category = "{{ category }}";
 let map = null;
@@ -172,9 +183,7 @@ let marker = null;
 
 // ================= LOAD WATER TYPES =================
 window.onload = function() {
-
     const dropdown = document.getElementById("waterType");
-
     let options = [];
 
     if (category === "ocean") {
@@ -203,7 +212,6 @@ window.onload = function() {
         dropdown.appendChild(option);
     });
 };
-
 
 // ================= LOCATION =================
 function getLocation(){
@@ -236,9 +244,9 @@ function showMap(lat, lon){
         marker = L.marker([lat, lon]).addTo(map);
     }
 
-    map.invalidateSize();
+    // Fix for map loading properly inside an initially hidden div on mobile
+    setTimeout(() => { map.invalidateSize(); }, 200);
 }
-
 
 // ================= BLE =================
 async function scanBLE(){
