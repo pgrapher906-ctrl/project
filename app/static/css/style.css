@@ -1,15 +1,16 @@
 /* ===================================
    GLOBAL BACKGROUND
 =================================== */
-body {
+html, body {
     margin: 0;
+    padding: 0;
     font-family: 'Poppins', sans-serif;
     min-height: 100vh;
     background: linear-gradient(rgba(10,61,98,0.75), rgba(10,61,98,0.75)),
                 url("../images/water-bg.jpg") no-repeat center center fixed;
     background-size: cover;
     color: #0A3D62;
-    overflow-x: hidden; /* Prevents whole website from sliding side-to-side on mobile */
+    overflow-x: hidden !important; /* Locks screen sliding completely */
 }
 
 /* ===================================
@@ -186,8 +187,8 @@ h2 {
     }
 
     main {
-        margin: 20px auto;
-        width: 95%;
+        margin: 10px auto;
+        width: 100%; /* Fix: Stopped forcing 95% which conflicts with padding */
         padding: 0 10px;
         box-sizing: border-box;
     }
@@ -199,7 +200,7 @@ h2 {
     }
 
     .form-card {
-        margin: 40px auto;
+        margin: 20px auto;
         width: 100%;
     }
 }
