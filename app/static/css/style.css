@@ -1,24 +1,19 @@
 /* ===================================
    GLOBAL BACKGROUND
 =================================== */
-
 body {
     margin: 0;
     font-family: 'Poppins', sans-serif;
     min-height: 100vh;
-
     background: linear-gradient(rgba(10,61,98,0.75), rgba(10,61,98,0.75)),
                 url("../images/water-bg.jpg") no-repeat center center fixed;
-
     background-size: cover;
     color: #0A3D62;
 }
 
-
 /* ===================================
    NAVBAR
 =================================== */
-
 .navbar {
     background: linear-gradient(90deg, #0A3D62, #145374);
     padding: 14px 28px;
@@ -59,22 +54,18 @@ body {
     background: #159c85;
 }
 
-
 /* ===================================
    MAIN WRAPPER
 =================================== */
-
 main {
     width: 95%;
     max-width: 900px;
     margin: 50px auto;
 }
 
-
 /* ===================================
    CARD DESIGN
 =================================== */
-
 .card {
     background: rgba(255,255,255,0.92);
     backdrop-filter: blur(12px);
@@ -84,11 +75,9 @@ main {
     margin-bottom: 30px;
 }
 
-
 /* ===================================
    LOGIN / REGISTER FORM CARD
 =================================== */
-
 .form-card {
     max-width: 420px;
     margin: 80px auto;
@@ -100,11 +89,9 @@ h2 {
     margin-bottom: 25px;
 }
 
-
 /* ===================================
    FORM ELEMENTS
 =================================== */
-
 .form-group {
     margin-bottom: 18px;
 }
@@ -125,11 +112,9 @@ h2 {
     background: white;
 }
 
-
 /* ===================================
    BUTTONS
 =================================== */
-
 .btn {
     border: none;
     padding: 10px 20px;
@@ -148,11 +133,9 @@ h2 {
     background: #159c85;
 }
 
-
 /* ===================================
    FLASH MESSAGES
 =================================== */
-
 .flashes {
     list-style: none;
     padding: 0;
@@ -178,11 +161,6 @@ h2 {
     border-left: 4px solid #E74C3C;
 }
 
-
-/* ===================================
-   CENTER WRAPPER (LOGIN FIX)
-=================================== */
-
 .center-wrapper {
     display: flex;
     justify-content: center;
@@ -190,24 +168,33 @@ h2 {
     min-height: 80vh;
 }
 
-
 /* ===================================
-   RESPONSIVE
+   RESPONSIVE LAYOUT (Mobile & Tablet)
 =================================== */
-
 @media (max-width: 768px) {
-
     .navbar {
         flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
+        padding: 15px;
+        gap: 12px;
+        text-align: center;
+    }
+
+    .navbar-right {
+        justify-content: center;
+        width: 100%;
     }
 
     main {
         margin: 20px auto;
+        width: 90%;
     }
 
     .card {
-        padding: 25px;
+        padding: 20px;
+    }
+
+    .form-card {
+        margin: 40px auto;
+        width: 100%;
     }
 }
