@@ -9,6 +9,7 @@ body {
                 url("../images/water-bg.jpg") no-repeat center center fixed;
     background-size: cover;
     color: #0A3D62;
+    overflow-x: hidden; /* Prevents whole website from sliding side-to-side on mobile */
 }
 
 /* ===================================
@@ -186,11 +187,15 @@ h2 {
 
     main {
         margin: 20px auto;
-        width: 90%;
+        width: 95%;
+        padding: 0 10px;
+        box-sizing: border-box;
     }
 
     .card {
         padding: 20px;
+        width: 100%;
+        box-sizing: border-box;
     }
 
     .form-card {
